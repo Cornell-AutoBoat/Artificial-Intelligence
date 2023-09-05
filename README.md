@@ -1,2 +1,2 @@
 # Artificial-Intelligence
-Code to move the boat autonomously!
+Code to for the ASV's decision-making.
