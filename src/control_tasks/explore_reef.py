@@ -39,9 +39,30 @@ def pivot_360():
 
 
 def start():
-    # Identify gate of black buoys
+    # Identify gate of black buoys 
     # Store midpoint to SFR
-    SFR.explore_reef_location = pivot_360()  # pivot 360 degrees
+    
+    down_midpoint = pivot_360()
+    if (down_midpoint== None):
+        #decrease z position to move down
+        waypoint_explore =[]
+        waypoint_explore.append([SFR.tx, SFR.tz - 150])
+        sL, sR = pure_pursuit.execute(waypoint_explore, sec=3)
+        down_midpoint = pivot_360()
+    
+
+    #initialize yellow_midpoint to midpoint after moving down
+    yellow_midpoint = down_midpoint
+    if (yellow_midpoint == None):
+            #assume we have global position of yellow buoy from speed challenge
+            #ask to store yellow buoy coordinates in a global file
+            yellow.x=0
+            yellow.z=0
+            waypoint_explore=[]
+            waypoint_explore.append([yellow.x,yellow.z])
+            sL, sR = pure_pursuit.execute(waypoint_explore, sec=3)                  
+
+    SFR.explore_reef_location =  pivot_360() # pivot 360 degrees
     SFR.task = Task.DETERMINE_TASK
 
 
