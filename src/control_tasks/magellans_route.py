@@ -13,10 +13,18 @@ def print_array(array):
     print('\n'.join([str(row)[80:200] for row in array]))
 
 def main():
+    """
+    Executes main functions for the task
+    """
     transition_to_task()
     execute_task()
 
 def transition_to_task():
+    """
+    Finds the first gate to begin the task, which is the first red and green 
+    buoy, and calculates the midpoint between the buoys
+    Executes the path to the midpoint using pure pursuit
+    """
     rospy.loginfo("finding first gate")
     begin_buoys, _ = filter_objects(["red-buoy", "green-buoy"])
     start_time = time.time()
@@ -45,7 +53,8 @@ def execute_task(repeat = True):
     rospy.loginfo("finding buoys")
     objects, _ = filter_objects(["red-buoy"])
     objects = np.array(list(filter(lambda o: o.x > -5 and o.x < 5, objects)))
-    objects = np.insert(objects, 0, Buoy(label="red-buoy", x = -2, y = 0, z = -4))
+    objects = np.insert(objects, 0, Buoy(label="red-buoy", x = -2, y = 0, z = -4)) 
+    #inserts at beginning of 'objects'
     add_objects_to_map(objects, objects_map, fill_between=True)
     object_count += len(objects) - 1
     last_red = objects[-1]
@@ -69,9 +78,11 @@ def execute_task(repeat = True):
 
     goal_x = np.clip(int((goal[0] - SFR.tx)*2 + 50), 0, 99)
     goal_z = np.clip(int((goal[1] - SFR.tz)*2 + 50), 0, 99)
+    # these two lines are transforming the goal coordinates from local to global
     end = (goal_x, goal_z)
     objects_map[goal_x][goal_z] = 0
-    waypoint_indices = get_waypoints(objects_map, (50, 50), end, allow_diagonal_movement=True)
+    waypoint_indices = get_waypoints(objects_map, (50, 50), end, allow_diagonal_movement=True) #what is (50,50)
+    # gets all the waypoints for the path form objects_map using A star
     if waypoint_indices == None:
         rospy.loginfo("can not find waypoints")
         SFR.magellans_route_complete = True
@@ -80,6 +91,7 @@ def execute_task(repeat = True):
 
     rospy.loginfo("finding global waypoints, performing A star")
     for index_x, index_z in waypoint_indices:
+        # appends global coordinates for all waypoints from waypoint_indices
         global_x = SFR.tx + (index_x - 50)/2
         global_z = SFR.tz + (index_z - 50)/2
 
@@ -88,6 +100,7 @@ def execute_task(repeat = True):
     rospy.loginfo(f"waypoints {waypoint_global}")
     rospy.loginfo("executing path")
     sL, sR = pure_pursuit.execute(waypoint_global, sec = 3, lookahead = 0.5)
+    # execute using pure pursuit
 
     # FINISH
     if object_count <= 2:
@@ -102,6 +115,10 @@ def execute_task(repeat = True):
         # TODO: add sleep
 
 def add_objects_to_map(objects, objects_map, fill_between = False):
+    """
+    This function is designed to add objects to a 2D map and optionally fill 
+    the space between objects on the map.
+    """
     object_indices = []
     prev = []
     for i in range(len(objects)):
