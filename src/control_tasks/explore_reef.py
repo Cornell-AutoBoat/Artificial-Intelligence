@@ -38,15 +38,23 @@ def pivot_360():
     return midpoint
 
 
+
 def start():
     # Identify gate of black buoys 
     # Store midpoint to SFR
     
     down_midpoint = pivot_360()
     if (down_midpoint== None):
-        #decrease z position to move down
-        waypoint_explore =[]
-        waypoint_explore.append([SFR.tx, SFR.tz - 150])
+        #decrease z position to move down 
+        #pivot until we see red buoy and return location of red buoy:
+        red_buoy_position = pivot_180()
+        #down locally, convert to global and pure pursuit 
+        waypoint_explore=[]
+        waypoint_explore.append([SFR.tx-150, SFR.tz])
+
+        #tx and tz = location relative to orientation
+        #map to global
+
         sL, sR = pure_pursuit.execute(waypoint_explore, sec=3)
         down_midpoint = pivot_360()
     
