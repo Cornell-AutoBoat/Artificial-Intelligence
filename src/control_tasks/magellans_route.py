@@ -54,7 +54,7 @@ def execute_task(repeat = True):
     objects, _ = filter_objects(["red-buoy"])
     objects = np.array(list(filter(lambda o: o.x > -5 and o.x < 5, objects)))
     objects = np.insert(objects, 0, Buoy(label="red-buoy", x = -2, y = 0, z = -4)) 
-    #inserts at beginning of 'objects'
+    #inserts at beginning of 'objects' so that the boat doesn't go backwards
     add_objects_to_map(objects, objects_map, fill_between=True)
     object_count += len(objects) - 1
     last_red = objects[-1]
@@ -67,6 +67,7 @@ def execute_task(repeat = True):
     objects, _ = filter_objects(["yellow-buoy", "black-buoy"])
     objects = np.array(list(filter(lambda o: o.x > -5 and o.x < 5, objects)))
     add_objects_to_map(objects, objects_map, fill_between=False)
+    nummber_eggs += len(objects) # change this global variable if necessary
 
     # print_array(objects_map)
 
