@@ -64,10 +64,14 @@ def execute_task(repeat = True):
     add_objects_to_map(objects, objects_map, fill_between=True)
     object_count += len(objects) - 1
     last_green = objects[-1]
-    objects, _ = filter_objects(["yellow-buoy", "black-buoy"])
+    objects, _ = filter_objects(["yellow-buoy"])
     objects = np.array(list(filter(lambda o: o.x > -5 and o.x < 5, objects)))
     add_objects_to_map(objects, objects_map, fill_between=False)
     nummber_eggs += len(objects) # change this global variable if necessary
+    
+    objects, _ = filter_objects(["black-buoy"])
+    objects = np.array(list(filter(lambda o: o.x > -5 and o.x < 5, objects)))
+    add_objects_to_map(objects, objects_map, fill_between=False)
 
     # print_array(objects_map)
 
