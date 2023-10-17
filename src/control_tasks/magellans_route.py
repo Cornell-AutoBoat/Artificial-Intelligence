@@ -53,14 +53,14 @@ def execute_task(repeat = True):
     rospy.loginfo("finding buoys")
     objects, _ = filter_objects(["red-buoy"])
     objects = np.array(list(filter(lambda o: o.x > -5 and o.x < 5, objects)))
-    objects = np.insert(objects, 0, Buoy(label="red-buoy", x = -2, y = 0, z = -4)) 
+    objects = np.insert(objects, 0, Buoy(label="red-buoy", x = -2, y = -4, z = 0)) 
     #inserts at beginning of 'objects' so that the boat doesn't go backwards
     add_objects_to_map(objects, objects_map, fill_between=True)
     object_count += len(objects) - 1
     last_red = objects[-1]
     objects, _ = filter_objects(["green-buoy"])
     objects = np.array(list(filter(lambda o: o.x > -5 and o.x < 5, objects)))
-    objects = np.insert(objects, 0, Buoy(label="green-buoy", x = 2, y = 0, z = -4))
+    objects = np.insert(objects, 0, Buoy(label="green-buoy", x = 2, y = -4, z = 0))
     add_objects_to_map(objects, objects_map, fill_between=True)
     object_count += len(objects) - 1
     last_green = objects[-1]
@@ -82,10 +82,10 @@ def execute_task(repeat = True):
     rospy.loginfo(f"goal point {goal}")
 
     goal_x = np.clip(int((goal[0] - SFR.tx)*2 + 50), 0, 99)
-    goal_z = np.clip(int((goal[1] - SFR.tz)*2 + 50), 0, 99)
+    goal_y = np.clip(int((goal[1] - SFR.ty)*2 + 50), 0, 99)
     # these two lines are transforming the goal coordinates from local to global
-    end = (goal_x, goal_z)
-    objects_map[goal_x][goal_z] = 0
+    end = (goal_x, goal_y)
+    objects_map[goal_x][goal_y] = 0
     waypoint_indices = get_waypoints(objects_map, (50, 50), end, allow_diagonal_movement=True) #what is (50,50)
     # gets all the waypoints for the path form objects_map using A star
     if waypoint_indices == None:
@@ -95,12 +95,12 @@ def execute_task(repeat = True):
     waypoint_global = []
 
     rospy.loginfo("finding global waypoints, performing A star")
-    for index_x, index_z in waypoint_indices:
+    for index_x, index_y in waypoint_indices:
         # appends global coordinates for all waypoints from waypoint_indices
         global_x = SFR.tx + (index_x - 50)/2
-        global_z = SFR.tz + (index_z - 50)/2
+        global_y = SFR.ty + (index_y - 50)/2
 
-        waypoint_global.append([global_x, global_z])
+        waypoint_global.append([global_x, global_y])
 
     rospy.loginfo(f"waypoints {waypoint_global}")
     rospy.loginfo("executing path")
@@ -128,10 +128,10 @@ def add_objects_to_map(objects, objects_map, fill_between = False):
     prev = []
     for i in range(len(objects)):
         # print(objects[i].x, objects[i].z)
-        global_coords = map_to_global(objects[i].x, objects[i].z)
-        object_x, object_z = global_coords[0], global_coords[1]
+        global_coords = map_to_global(objects[i].x, objects[i].y)
+        object_x, object_y = global_coords[0], global_coords[1]
         object_row_index = (object_x - SFR.tx)*2 + 50
-        object_col_index = (object_z - SFR.tz)*2 + 50
+        object_col_index = (object_y - SFR.ty)*2 + 50
         # print(object_row_index, object_col_index)
         if object_row_index < 98 and object_col_index < 98 and object_row_index > 1 and object_col_index > 1:
             object_indices.append((object_row_index, object_col_index))
@@ -148,28 +148,28 @@ def add_objects_to_map(objects, objects_map, fill_between = False):
              and objects_map[int(object_row_index) + 1][int(object_col_index) + 1] == 0):
                 objects_map[int(object_row_index)][int(object_col_index)] = 1
 
-def fill(indices, x1, z1, x2, z2):
+def fill(indices, x1, y1, x2, y2):
     x_inc = 1
     if x2 < x1:
         x_inc = -1
 
-    z_inc = 1
-    if z2 < z1:
-        z_inc = -1
+    y_inc = 1
+    if y2 < y1:
+        y_inc = -1
 
     x_i = 0
-    z_i = 0
-    while x_i + x1 != x2 and z_i + z1 != z2:
-        indices.append((x1 + x_i, z1 + z_i))
-        indices.append((x1 + x_i + x_inc, z1 + z_i))
-        indices.append((x1 + x_i, z1 + z_i + z_inc))
+    y_i = 0
+    while x_i + x1 != x2 and y_i + y1 != y2:
+        indices.append((x1 + x_i, y1 + y_i))
+        indices.append((x1 + x_i + x_inc, y1 + y_i))
+        indices.append((x1 + x_i, y1 + y_i + y_inc))
         x_i += x_inc
-        z_i += z_inc
+        y_i += y_inc
 
     while x_i + x1 != x2:
-        indices.append((x1 + x_i, z2))
+        indices.append((x1 + x_i, y2))
         x_i += x_inc
 
-    while z_i + z1 != z2:
-        indices.append((x2, z1 + z_i))
-        z_i += z_inc
+    while y_i + y1 != y2:
+        indices.append((x2, y1 + y_i))
+        y_i += y_inc
