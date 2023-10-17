@@ -28,7 +28,7 @@ def map_to_global(x, y):
     if theta < -np.pi:
         theta += 2 * np.pi
     H = np.array([[np.cos(theta), -np.sin(theta), SFR.tx],
-                  [np.sin(theta), np.coos(theta), SFR.ty],
+                  [np.sin(theta), np.cos(theta), SFR.ty],
                   [0, 0, 1]])
     x, y, z = H @ np.array([x, y])
     return [x/z, y/z]
