@@ -89,6 +89,16 @@ def execute_end(repeat = True):
     sL, sR = pure_pursuit.execute(waypoint_explore, sec=3)
 
 
+    #go to yellow buoy
+    #A* and pure pursuit to black buoys below
+    yellow_buoy.tx=0
+    yellow_buoy.ty=0
+    waypoint_explore=[]
+    waypoint_explore.append([yellow.tx,yellow.ty])
+    sL, sR = pure_pursuit.execute(waypoint_explore, sec=3)
+
+
+#insert cases here 
 #insert cases here 
     goal = SFR.explore_reef_location
     objects = SFR.objects
