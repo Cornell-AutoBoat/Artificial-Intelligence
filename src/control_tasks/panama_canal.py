@@ -19,11 +19,13 @@ import rospy
 #
 # LR  x  LG
 
+
 def backup():
-    w = [[SFR.tx, SFR.tz + 4.5]]
+    w = [[SFR.tx, SFR.ty + 4.5]]
     # sL, sR = pure_pursuit.execute(w, lookahead=2.0)
     piecewise.follow(w)
     thruster_utils.break_thrusters(sL, sR)
+
 
 def pivot(seen):
     # [[close red, close green], [far red, far green]]
@@ -40,7 +42,7 @@ def pivot(seen):
         buoys, seen = utils.filter_objects(
             ["green-column-buoy", "red-column-buoy"], seen)
         for b in buoys:
-            if b.z < 4.0:   # buoy is less than 4 meters away
+            if b.y < 4.0:   # buoy is less than 4 meters away
                 if b.label == "red-column-buoy":
                     gates[0, 0] = b
                 else:
@@ -62,7 +64,7 @@ def pivot(seen):
             buoys, seen = utils.filter_objects(
                 ["green-column-buoy", "red-column-buoy"], seen)
             for b in buoys:
-                if b.z < 4.0:   # buoy is less than 4 meters away
+                if b.y < 4.0:   # buoy is less than 4 meters away
                     if b.label == "red-column-buoy":
                         gates[0, 0] = b
                     else:
@@ -84,7 +86,7 @@ def pivot(seen):
             buoys, seen = utils.filter_objects(
                 ["green-column-buoy", "red-column-buoy"], seen)
             for b in buoys:
-                if b.z < 4.0:   # buoy is less than 4 meters away
+                if b.y < 4.0:   # buoy is less than 4 meters away
                     if b.label == "red-column-buoy":
                         gates[0, 0] = b
                     else:
@@ -111,10 +113,10 @@ def execute():
     waypoints = []
     if len(buoys) == 4:
         rospy.loginfo("all buoys seen immediately")
-        mid_x1, mid_z1 = utils.get_extended_midpoint(buoys[0], buoys[1], t=1)
-        mid_x2, mid_z2 = utils.get_extended_midpoint(buoys[2], buoys[3], t=3)
-        waypoints.append(utils.map_to_global(mid_x1, mid_z1))
-        waypoints.append(utils.map_to_global(mid_x2, mid_z2))
+        mid_x1, mid_y1 = utils.get_extended_midpoint(buoys[0], buoys[1], t=1)
+        mid_x2, mid_y2 = utils.get_extended_midpoint(buoys[2], buoys[3], t=3)
+        waypoints.append(utils.map_to_global(mid_x1, mid_y1))
+        waypoints.append(utils.map_to_global(mid_x2, mid_y2))
         sL, sR = pure_pursuit.execute(waypoints)
         time.sleep(1)
         thruster_utils.break_thrusters(sL, sR)
@@ -135,8 +137,8 @@ def execute():
                     b1, b2 = gate[0], gate[1]
                     if b1 and b2:
                         # calculate the midpoint in local coords
-                        mid_x, mid_z = utils.get_extended_midpoint(b1, b2)
-                        waypoints.append(utils.map_to_global(mid_x, mid_z))
+                        mid_x, mid_y = utils.get_extended_midpoint(b1, b2)
+                        waypoints.append(utils.map_to_global(mid_x, mid_y))
                         gates_passed += 1
                 sL, sR = pure_pursuit.execute(waypoints)
         thruster_utils.break_thrusters(sL, sR)

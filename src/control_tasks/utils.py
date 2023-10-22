@@ -30,7 +30,7 @@ def map_to_global(x, y):
     H = np.array([[np.cos(theta), -np.sin(theta), SFR.tx],
                   [np.sin(theta), np.cos(theta), SFR.ty],
                   [0, 0, 1]])
-    x, y, z = H @ np.array([x, y])
+    x, y, z = H @ np.array([x, y, 1.0])
     return [x/z, y/z]
 
 
