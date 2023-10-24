@@ -80,12 +80,12 @@ def execute_end(repeat = True):
     # Use A* to navigate through gate
     # Get the current coordinates
 
-    #go to yellow buoy
+    #retrieve global coordinates of yellow buoy of speed challenge
     #A* and pure pursuit to black buoys below
-    yellow_buoy.tx=0
-    yellow_buoy.ty=0
+    y_buoy_x= yellow_buoy.tx
+    y_buoy_y=yellow_buoy.ty-50
     waypoint_explore=[]
-    waypoint_explore.append([yellow.tx,yellow.ty])
+    waypoint_explore.append([y_buoy_x,y_buoy_y])
     sL, sR = pure_pursuit.execute(waypoint_explore, sec=3)
 
 

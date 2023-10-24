@@ -28,6 +28,14 @@ def seen(o, s):
 
     return False
 
+    # for seen_o in s:
+    #     if o.label == seen_o.label:
+    #         global_o = np.array(map_to_global(o.x, o.y))
+    #         global_seen_o = np.array(map_to_global(seen_o.x, seen_o.y))
+    #         if np.sum(np.square(global_o - global_seen_o)) <= 1:
+    #             return True
+
+    # return False
 
 def map_to_global(x, y):
     """
@@ -145,7 +153,10 @@ def filter_objects(labels, previously_seen=[],  axis='y'):
     # objs only has objects with a label in labels
     objs = np.array(
         list(filter(lambda o: not (seen(o, previously_seen)) and o.label in labels, SFR.objects)))
-
+    
+    #new correct objects:
+    #want to filter new_objs to get only objects with labels in label
+    
     # if we see no objects that fit criteria return empty set
     if not np.all(objs):
         return np.array([]), previously_seen
@@ -156,7 +167,7 @@ def filter_objects(labels, previously_seen=[],  axis='y'):
         get_axis_vals = np.vectorize(get_attr)
         objs = objs[get_axis_vals(objs).argsort()]
 
-    s = np.concatenate((previously_seen, objs))
+    s = np.concatenate((previously_seen, objs)) 
 
     return objs, s
 
