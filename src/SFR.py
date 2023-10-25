@@ -29,8 +29,8 @@ sR = 1500
 kill = False
 
 # Boat position variables. Updated by the ZED node.
-tx, ty, tz = 0.0, 0.0, 0.0
-ox, oy, oz, ow = 0.0, 0.0, 0.0, 0.0
+tx, ty = 0.0, 0.0
+heading = 0.0
 
 # Velocities. Updated by the ZED node.
 prev_time = 0

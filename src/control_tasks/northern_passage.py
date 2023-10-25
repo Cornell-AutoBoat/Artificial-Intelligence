@@ -16,11 +16,11 @@ import math
 def filter_buoys(objects):
     # filter buoys array to contain valid buoys: must be green or red or blue
 
-    # buoys contains only green, red, blue buoys
+    # buoys contains only green, red, blue buoys, yellow buoy
     buoys = np.array(list(filter(lambda b: b.label == "green-buoy" or b.label ==
-                     "red-buoy" or b.label == "blue-buoy", objects)))
+                     "red-buoy" or b.label == "blue-buoy", b.label == 'yellow-buoy', objects)))
 
-    # orders buoys by blue, green, red
+    # orders buoys by blue, green, red, yellow
     ordered_buoys = sorted(buoys, key=lambda o: o.label)
 
     return ordered_buoys
@@ -32,75 +32,31 @@ def pivot():
 
     # when less than 3 buoys are seen
     while (len(buoys) < 3):
-        # when only 1 buoy is seen
-        if len(buoys) == 1:
-            # if only a green buoy is seen
-            if buoys[0].label == "green-buoy":
-                start = time.time()
-                while (not (buoys[0] == "blue-buoy" and buoys[1] == "green-buoy" and buoys[2] == "red-buoy")):
-                    if time.time() - start > 20:
-                        thruster_utils.break_thrusters(sL, sR)
-                        finish("FAILURE")
-                    sL, sR = 1550, 1450
-                    thruster_utils.sendValue(sL, sR)
-                    buoys = filter_buoys(SFR.objects)
-                    if (buoys[0] == "green-buoy" and buoys[1] == "red-buoy"):
-                        sL, sR = pure_pursuit.execute(utils.get_extended_midpoint(buoys[0], buoys[1], -1.75))
-                        buoys = filter_buoys(SFR.objects)
-                thruster_utils.break_thrusters(sL, sR)
-            # if only a red buoy is seen
-            elif buoys[0].label == "red-buoy":
-                start = time.time()
-                while (not (buoys[0] == "blue-buoy" and buoys[1] == "green-buoy" and buoys[2] == "red-buoy")):
-                    if time.time() - start > 20:
-                        thruster_utils.break_thrusters(sL, sR)
-                        finish("FAILURE")
-                    sL, sR = 1450, 1550
-                    thruster_utils.sendValue(sL, sR)
-                    buoys = filter_buoys(SFR.objects)
-                    if (buoys[0] == "green-buoy" and buoys[1] == "red-buoy"):
-                        sL, sR = pure_pursuit.execute(utils.get_extended_midpoint(buoys[0], buoys[1], -1.75))
-                        buoys = filter_buoys(SFR.objects)
-                thruster_utils.break_thrusters(sL, sR)
-
         # when 2 buoys are seen
-        else:
-            # if a green and red buoy are seen
-            if buoys[0].label == "green-buoy" and buoys[1].label == "red-buoy":
-                sL, sR = pure_pursuit.execute(
-                    utils.get_extended_midpoint(buoys[0], buoys[1], -1.75))
+        # if a green and red buoy are seen
+        if buoys[0].label == "green-buoy" and buoys[1].label == "red-buoy":
+            sL, sR = pure_pursuit.execute(
+                utils.get_extended_midpoint(buoys[0], buoys[1], -1.75))
+            buoys = filter_buoys(SFR.objects)
+            thruster_utils.break_thrusters(sL, sR)
+        # if a blue and red buoy are seen, but not a green
+        if buoys[0].label == "blue-buoy" and buoys[1].label == "red-buoy":
+            sL, sR = 1450, 1550
+            thruster_utils.sendValue(sL, sR)
+            start = time.time()
+            while (not (buoys[0] == "blue-buoy" and buoys[1] == "green-buoy" and buoys[2] == "red-buoy")):
                 buoys = filter_buoys(SFR.objects)
-                thruster_utils.break_thrusters(sL, sR)
-            # if a blue and green buoy are seen, but not a red
-            if buoys[0].label == "blue-buoy" and buoys[1].label == "green-buoy":
-                sL, sR = 1550, 1450
-                thruster_utils.sendValue(sL, sR)
-                start = time.time()
-                while (not (buoys[0] == "blue-buoy" and buoys[1] == "green-buoy" and buoys[2] == "red-buoy")):
-                    buoys = filter_buoys(SFR.objects)
-                    if time.time() - start > 20:
-                        thruster_utils.break_thrusters(sL, sR)
-                        finish("FAILURE")
-                thruster_utils.break_thrusters(sL, sR)
-                sL, sR = pure_pursuit.execute(
-                    utils.get_extended_midpoint(buoys[0], buoys[1], -1.75))
-                thruster_utils.break_thrusters(sL, sR)
-                buoys = filter_buoys(SFR.objects)
-            # if a blue and red buoy are seen, but not a green
-            if buoys[0].label == "blue-buoy" and buoys[1].label == "red-buoy":
-                sL, sR = 1450, 1550
-                thruster_utils.sendValue(sL, sR)
-                start = time.time()
-                while (not (buoys[0] == "blue-buoy" and buoys[1] == "green-buoy" and buoys[2] == "red-buoy")):
-                    buoys = filter_buoys(SFR.objects)
-                    if time.time() - start > 20:
-                        thruster_utils.break_thrusters(sL, sR)
-                        finish("FAILURE")
-                thruster_utils.break_thrusters(sL, sR)
-                sL, sR = pure_pursuit.execute(
-                    utils.get_extended_midpoint(buoys[0], buoys[1], -1.75))
-                thruster_utils.break_thrusters(sL, sR)
-                buoys = filter_buoys(SFR.objects)
+                if time.time() - start > 20:
+                    thruster_utils.break_thrusters(sL, sR)
+                    finish("FAILURE")
+            thruster_utils.break_thrusters(sL, sR)
+            sL, sR = pure_pursuit.execute(
+                utils.get_extended_midpoint(buoys[0], buoys[1], -1.75))
+            thruster_utils.break_thrusters(sL, sR)
+            buoys = filter_buoys(SFR.objects)
+
+            # last case?
+            # if a yellow and red buoy are seen, but not a green
     # no buoys seen
     if len(buoys) < 3:
         finish("FAILURE")
