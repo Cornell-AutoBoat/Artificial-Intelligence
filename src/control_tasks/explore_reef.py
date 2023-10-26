@@ -72,43 +72,22 @@ def pivot_180():
 def start():
     # Identify gate of black buoys 
     # Store midpoint to SFR
-    """
-    down_midpoint = pivot_360()
-    if (down_midpoint== None):
-
-        
-        #decrease z position to move down 
-        #pivot until we see red buoy and return location of red buoy:
-        red_buoy_position = pivot_180()
-        #down locally, convert to global and pure pursuit 
-        waypoint_explore_global=map_to_global(red_buoy_position[0]-150, red_buoy_position[1])
-        waypoint_explore.append([waypoint_explore_global[0], waypoint_explore_global[1]])
-
-        #tx and tz = location relative to orientation
-        #map to global
-
-        sL, sR = pure_pursuit.execute(waypoint_explore, sec=3)
-        down_midpoint = pivot_360()
-    
-
-    #initialize yellow_midpoint to midpoint after moving down
-    yellow_midpoint = down_midpoint
-    if (yellow_midpoint == None):
-            #assume we have global position of yellow buoy from speed challenge
-            #ask to store yellow buoy coordinates in a global file
-            yellow_buoy.x=0
-            yellow_buoy.y=0
-            waypoint_explore=[]
-            waypoint_explore.append([yellow.x,yellow.y])
-            sL, sR = pure_pursuit.execute(waypoint_explore, sec=3)                  
-    """
-    SFR.explore_reef_location =  pivot_360() # pivot 360 degrees
+    SFR.explore_reef_location = pivot_360()  # pivot 360 degrees
     SFR.task = Task.DETERMINE_TASK
 
 
 def execute_end(repeat = True):
     # Use A* to navigate through gate
     # Get the current coordinates
+
+    #retrieve global coordinates of yellow buoy of speed challenge
+    #A* and pure pursuit to black buoys below
+    y_buoy_x= yellow_buoy.tx
+    y_buoy_y=yellow_buoy.ty-50
+    waypoint_explore=[]
+    waypoint_explore.append([y_buoy_x,y_buoy_y])
+    sL, sR = pure_pursuit.execute(waypoint_explore, sec=3)
+
 
     #go to yellow buoy
     #A* and pure pursuit to black buoys below
@@ -119,6 +98,7 @@ def execute_end(repeat = True):
     sL, sR = pure_pursuit.execute(waypoint_explore, sec=3)
 
 
+#insert cases here 
 #insert cases here 
     goal = SFR.explore_reef_location
     objects = SFR.objects

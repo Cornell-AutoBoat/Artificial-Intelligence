@@ -234,7 +234,37 @@ class TestMapToGlobal(unittest.TestCase):
 
 
 class TestGetMidpoint(unittest.TestCase):
-    pass
+    def test_get_midpoint_both_origin(self):
+        SFR.tx = 0
+        SFR.ty=0
+        o1 = Buoy("test-buoy1", 0.0, 0.0, 0.0)
+        o11 = Buoy("test-buoy11", 0.0, 0.0, 0.0)
+        mid1 = [0.0, 0.0]
+        self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
+    
+    def test_get_midpoint_one_origin_one_not_origin(self):
+        o1 = Buoy("test-buoy1", 0.0, 0.0, 0.0)
+        o11 = Buoy("test-buoy11", 1.0, 2.0, 0.0)
+        mid1 = [0.5, 1.0]
+        self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
+    
+    def test_get_midpoint_both_not_at_origin(self):
+        o1 = Buoy("test-buoy1", 5.0, 2.0, 0.0)
+        o11 = Buoy("test-buoy11", 1.0, 2.0, 0.0)
+        mid1 = [3.0, 2.0]
+        self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
+
+    def test_get_midpoint_two_close_points(self):
+        o1 = Buoy("test-buoy1", 5.22, 3.2, 0.0)
+        o11 = Buoy("test-buoy11", 5.2, 3.0, 0.0)
+        mid1 = [5.21, 3.1]
+        self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
+
+    def test_get_midpoint_two_far_points(self):
+        o1 = Buoy("test-buoy1", 3.1, 2.1, 0.0)
+        o11 = Buoy("test-buoy11", 1000.2, 20000.1, 0.0)
+        mid1 = [501.65, 10001.1]
+        self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
 
 
 class TestGetExtendedMidpoint(unittest.TestCase):
