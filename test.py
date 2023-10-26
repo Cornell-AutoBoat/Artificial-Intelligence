@@ -238,11 +238,89 @@ class TestGetMidpoint(unittest.TestCase):
 
 
 class TestGetExtendedMidpoint(unittest.TestCase):
-    pass
+    
+    SFR.tx = 0
+    SFR.tz = 0 
+    SFR.ty = 0
+
+    def test_basic_midpoint_functionality(self):
+        o1 = Buoy("red-buoy", 0.0, 1.0, 0.0)
+        o2 = Buoy("green-buoy", 0.0, 2.0, 0.0)
+        x = -1
+        y = 1.5
+        self.assertEqual(utils.get_extended_midpoint(o1, o2, t = 1), [x, y], "did not find midpoint" )
+
+
+    def test_midpoint_same_point(self): 
+        o1 = Buoy("red-buoy", 0.0, 1.0, 0.0)
+        o2 = Buoy("green-buoy", 0.0, 1.0, 0.0 )
+        x = -1
+        y = 1
+        self.assertEqual(utils.get_extended_midpoint(o1, o2, t=1), [x, y], "same point")
+
+    SFR.tx = 1
+    SFR.tz = 0 
+    SFR.ty = 1
+
+    def test_midpoint_same_point(self): 
+        o1 = Buoy("red-buoy", 1.0, 5.0, 0.0)
+        o2 = Buoy("green-buoy", 5.0, 1.0, 0.0 )
+        x = 4
+        y = 4
+        self.assertEqual(utils.get_extended_midpoint(o1, o2, t=1), [x, y], "same point")
+
+
+    def test_midpoint_same_point(self): 
+        o1 = Buoy("red-buoy", -1.0, 1.0, 0.0)
+        o2 = Buoy("green-buoy", 1.0, 1.0, 0.0 )
+        x = 0
+        y = 1
+        self.assertEqual(utils.get_extended_midpoint(o1, o2, t=0), [x, y], "same point")
+
+
+    def test_midpoint_same_point(self): 
+        o1 = Buoy("red-buoy", -2.0, -2.0, 0.0)
+        o2 = Buoy("green-buoy", -3.0, -2.0, 0.0 )
+        x = -2.5
+        y = -3.0
+        self.assertEqual(utils.get_extended_midpoint(o1, o2, t=-1), [x, y], "same point")
+
 
 
 class TestGetShiftedExtendedMidpoint(unittest.TestCase):
-    pass
+    SFR.tx = 0
+    SFR.tz = 0 
+    SFR.ty = 0
+
+   #o1, o2
+    def test_basic_shifted_functionality_2points(self):
+        o1 = Buoy("red-buoy", 1.0, 1.0, 0.0)
+        o2 = Buoy("green-buoy", 1.0, 3.0, 0.0)
+        x = 2
+        y = 1
+        self.assertEqual(utils.get_shifted_em(o1, o2, t = -1), [x, y], "did not find midpoint" )
+
+    #o2,01
+    def test_basic_shifted_functionality_2points(self):
+        o1 = Buoy("red-buoy", 1.0, 1.0, 0.0)
+        o2 = Buoy("green-buoy", 1.0, 3.0, 0.0)
+        x = 2
+        y = 3
+        self.assertEqual(utils.get_shifted_em(o2, o1, t = -1), [x, y], "did not find midpoint" )
+
+    def test_basic_shifted_functionality_2points(self):
+        o1 = Buoy("red-buoy", -3.0, 3.0, 0.0)
+        o2 = Buoy("green-buoy", -3.0, -3.0, 0.0)
+        x = -6
+        y = 3
+        self.assertEqual(utils.get_shifted_em(o1, o2, t =3), [x, y], "did not find midpoint" )
+
+    def test_midpoint_same_point(self): 
+        o1 = Buoy("red-buoy", 0.0, 1.0, 0.0)
+        o2 = Buoy("green-buoy", 0.0, 1.0, 0.0 )
+        x = 0
+        y = 2
+        self.assertEqual(utils.get_shifted_em(o1, o2, t=1), [x, y], "same point")
 
 
 class TestGetExtendedBuoy(unittest.TestCase):
