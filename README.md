@@ -1,5 +1,5 @@
 # Artificial-Intelligence
-Code for the ASV's decision-making. Boat brains.
+Code for the ASV's decision-making. Boat brains!
 
 ## Changing the code
 To make changes to the code, clone the repo by selecting '<> Code' and copying the HTTPS link. Open VSCode, select 'Clone Git Repository...', copy the link, and follow the instructions.
