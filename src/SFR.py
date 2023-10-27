@@ -28,7 +28,7 @@ sR = 1500
 # Indicates whether the MC code wants to kill the system
 kill = False
 
-# Boat position variables. Updated by the ZED node.
+# Boat position variables. Updated by the Serial Communication node with data from the GPS and compass.
 tx, ty = 0.0, 0.0
 heading = 0.0
 
