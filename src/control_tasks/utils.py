@@ -138,27 +138,38 @@ def filter_objects(labels, previously_seen=[],  axis='y'):
         previously_seen: set.
         axis: one of 'x', 'y', or 'z'.
     Returns:
-        objs: sorted numpy array of objects.
+        objs: sorted numpy array of objects with correct label that have not been seen before
         seen: the updated set of objects seen.
     """
 
     # objs only has objects with a label in labels
+    #split: one for return , one for previoiusly seen
     objs = np.array(
-        list(filter(lambda o: not (seen(o, previously_seen)) and o.label in labels, SFR.objects)))
-
+        list(filter(lambda o: not (seen(o, previously_seen)), SFR.objects)))
+    #maybe delete this part: and o.label in labels
+    #new correct objects:
+    #want to filter new_objs to get only objects with labels in label
+    obj_corr = np.array(
+        list(filter(lambda o: o.label in labels), objs))
+    
     # if we see no objects that fit criteria return empty set
-    if not np.all(objs):
+    if not np.all(obj_corr):
         return np.array([]), previously_seen
 
     # sort objects by axis
-    if len(objs) > 0:
+    if len(obj_corr) > 0:
         def get_attr(o): return getattr(o, axis)
         get_axis_vals = np.vectorize(get_attr)
         objs = objs[get_axis_vals(objs).argsort()]
 
-    s = np.concatenate((previously_seen, objs))
+    #combine a set and array - look this up later
 
-    return objs, s
+    for obj in objs:
+        previously_seen.add(obj)
+    
+    #previously_seen is a set, obj_corr is an array!
+
+    return obj_corr, previously_seen
 
 
 def pivot_to_gate(s):
