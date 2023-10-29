@@ -284,6 +284,45 @@ class TestGetYaw(unittest.TestCase):
 
 
 class TestFilterObjects(unittest.TestCase):
+    def test_one_labeled_object(self):
+        SFR.objects = [Buoy("red_buoy", 0,0,0), Buoy("blue_buoy", 0,5,0)]
+        labels = ["red_buoy", "green_buoy"]
+        o1 = Buoy("red_buoy", 0,0,0)
+        o2 = Buoy("blue_buoy", 0,5,0)
+        #previously_seen = {}
+        #new_objects = {o1,o2}
+        #new_correct_objects = [o1]
+        new_correct_obj, seen_obj = utils.filter_objects(labels, {}, 'y')
+        #s = {o1,o2}
+        self.assertEqual(new_correct_obj, [o1])
+        self.assertEqual(seen_obj, {o1,o2})
+    
+    def test_no_labeled_object(self):
+        SFR.objects = [Buoy("red_buoy", 0,0,0), Buoy("blue_buoy", 0,5,0)]
+        labels = ["red_buoy", "green_buoy"]
+        o1 = Buoy("red_buoy", 0,0,0) #utils.map_to_global(0,0)[0], utils.map_to_global(0,0)[1], 0 
+        o2 = Buoy("blue_buoy", 0,5,0)
+        previously_seen = {o1} #should have global coordinates
+        #new_objects = {o2}
+        #new_correct_objects = []
+        new_correct_obj, seen_obj = utils.filter_objects(labels, previously_seen, 'y')
+        #s = {o1,o2}
+        self.assertEqual(new_correct_obj, [])
+        self.assertEqual(seen_obj, {o1,o2})
+
+    def test_y_axis_sorted(self):
+        SFR.objects = [Buoy("red_buoy", 0,0,0), Buoy("blue_buoy", 0,5,0)]
+        labels = ["red_buoy", "green_buoy"]
+        o1 = Buoy("red_buoy", 0,0,0)
+        o2 = Buoy("blue_buoy", 0,5,0)
+        previously_seen = {}
+        #new_objects = {o1,o2}
+        #new_correct_objects = [o1]
+        new_correct_obj, seen_obj = utils.filter_objects(labels, previously_seen, 'y')
+        def get_attr(o) : return get_attr(o,'y')
+        get_axis_vals = np.vectorize(get_attr)
+        #s = {o1,o2}
+        self.assertEqual(new_correct_obj, get_axis_vals(new_correct_obj).argsort())
     pass
 
 
