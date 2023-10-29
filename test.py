@@ -82,7 +82,7 @@ class TestFilterCorrectSign(unittest.TestCase):
     def test_two_signs(self):
         o1 = Buoy("red-buoy", 4.0, 0.0, 0.0)
         o2 = Buoy("green-buoy", 0.0, 0.0, 0.0)
-        SFR.objects[o1,o2]
+        SFR.objects = [o1,o2]
         SFR.sign_color = "green"
         self.assertEqual(utils.filter_correct_sign(), ([o1], [o1]), "Testing for two different signs")
     def test_multiple_signs(self):
@@ -90,7 +90,7 @@ class TestFilterCorrectSign(unittest.TestCase):
         o2 = Buoy("green-buoy", 0.0, 0.0, 0.0)
         o3 = Buoy("green-buoy", -2.0, 0.0, 0.0)
         o4 = Buoy("green-buoy", -3.0, 0.0, 0.0)
-        SFR.objects[o1,o2,o3,o4]
+        SFR.objects = [o1,o2,o3,o4]
         SFR.sign_color = "red"
         self.assertEqual(utils.filter_correct_sign(), ([o1], [o1]), "Testing for mutliple different signs")
     def test_multiple_signs_seen(self):
@@ -98,7 +98,7 @@ class TestFilterCorrectSign(unittest.TestCase):
         o2 = Buoy("green-buoy", 0.0, 0.0, 0.0)
         o3 = Buoy("green-buoy", -2.0, 0.0, 0.0)
         o4 = Buoy("green-buoy", -3.0, 0.0, 0.0)
-        SFR.objects[o1,o2,o3,o4]
+        SFR.objects = [o1,o2,o3,o4]
         SFR.sign_color = "green"
         self.assertEqual(utils.filter_correct_sign([o1]), ([o2], [o1, o2]), "Testing for mutliple different signs with previously seen")
 
