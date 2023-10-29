@@ -109,10 +109,26 @@ def execute():
         waypoint = [utils.get_shifted_em(targetSign[0], sideSign, -1)]
         sL, sR = pure_pursuit.execute(waypoint)
 
-        rospy.loginfo("determined waypoint: " + str(waypoint))
-        rospy.loginfo("eggs found: " + targetSign[0].label[1])
+         ####### CHANGE
+        rospy.loginfo("found sideSign: (" +
+                     str(sideSign.x) + ", " + str(sideSign.z) + ")")
+        yDifference = np.absolute(sideSign.y - targetY)
+        xDifference = np.absolute(sideSign.x - targetX)
+        slopeTarget = -1* yDifference / xDifference
+        univertedSlope = xDifference / yDifference
+        currLocX = tx
+        currLocY = ty
+        currLocZ = tz
+        waypointX = ((univertedSlope * currLocX) +  currLocY + ((slopeTarget)*targetSign[0].x) - targetSign[0].y)/(slopeTarget - invertedSlope)
+        waypointY = (slopeTarget(tx-targetSign[0].x)+ targetSign[0].y)
+        waypoint2 = [utils.get_shifted_em(targetSign[0], sideSign, -1)]
+        sL, sR = pure_pursuit.execute(waypoint2)
+        
+        rospy.loginfo("determined waypoint: " + str(waypoint2))
+
+        # ADD orientation code
+
         # move forward
-        SFR.number_eggs = targetSign[0].label[1]
         thruster_utils.break_thrusters(sL, sR)
 
         start = time.time()
