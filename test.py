@@ -336,11 +336,100 @@ class TestFilterObjects(unittest.TestCase):
 
 
 class TestFilterCorrectSign(unittest.TestCase):
-    pass
+    def test_empty_set(self):
+        SFR.objects = []
+        objs, seen = utils.filter_correct_sign()
+        self.assertTrue(np.array_equal(objs, np.array([])), "testing first return value")
+        self.assertEqual(seen, [], "testing second return value")
+    def test_one_sign(self):
+        o1 = Buoy("red-buoy", 0.0, 0.0, 0.0)
+        SFR.objects = [o1]
+        SFR.sign_color = "r"
+        objs, seen = utils.filter_correct_sign()
+        self.assertTrue(np.array_equal(objs, np.array([])), "testing first return value")
+        self.assertEqual(seen, [], "testing second return value")
+    def test_two_signs(self):
+        o1 = Buoy("red-buoy", 4.0, 0.0, 0.0)
+        o2 = Buoy("green-buoy", 0.0, 0.0, 0.0)
+        SFR.objects = [o1,o2]
+        SFR.sign_color = "g"
+        objs, seen = utils.filter_correct_sign()
+        self.assertTrue(np.array_equal(objs, np.array([])), "testing first return value")
+        self.assertEqual(seen, [], "testing second return value")
+    def test_multiple_signs(self):
+        o1 = Buoy("red-buoy", 4.0, 0.0, 0.0)
+        o2 = Buoy("green-buoy", 0.0, 0.0, 0.0)
+        o3 = Buoy("green-buoy", -2.0, 0.0, 0.0)
+        o4 = Buoy("green-buoy", -3.0, 0.0, 0.0)
+        SFR.objects = [o1,o2,o3,o4]
+        SFR.sign_color = "r"
+        objs, seen = utils.filter_correct_sign()
+        self.assertTrue(np.array_equal(objs, np.array([])), "testing first return value")
+        self.assertEqual(seen, [], "testing second return value")
+    def test_multiple_signs_seen(self):
+        o1 = Buoy("red-buoy", 4.0, 0.0, 0.0)
+        o2 = Buoy("green-buoy", 0.0, 0.0, 0.0)
+        o3 = Buoy("green-buoy", -2.0, 0.0, 0.0)
+        o4 = Buoy("green-buoy", -3.0, 0.0, 0.0)
+        SFR.objects = [o1,o2,o3,o4]
+        SFR.sign_color = "g"
+        objs, seen = utils.filter_correct_sign()
+        self.assertTrue(np.array_equal(objs, np.array([])), "testing first return value")
+        self.assertEqual(seen, [], "testing second return value")
+        
 
 
 class TestFilterSigns(unittest.TestCase):
-    pass
+    def test_empty_set(self):
+        SFR.objects = np.array([])
+        objs, seen = utils.filter_signs()
+        self.assertTrue(np.array_equal(objs, np.array([])), "testing first return value")
+        self.assertEqual(seen, [], "testing second return value")
+    def test_one_sign(self):
+        o1 = Buoy("red-sign", 0.0, 0.0, 0.0)
+        SFR.objects = [o1]
+        objs, seen = utils.filter_signs()
+        self.assertTrue(np.array_equal(objs, np.array([])), "testing first return value")
+        self.assertEqual(seen, [], "testing second return value")
+    def test_two_signs(self):
+        o1 = Buoy("red-sign", 4.0, 0.0, 0.0)
+        o2 = Buoy("green-sign", 0.0, 0.0, 0.0)
+        SFR.objects = [o2,o1]
+        objs, seen = utils.filter_signs()
+        self.assertTrue(np.array_equal(objs, np.array(SFR.objects)), "testing first return value")
+        self.assertTrue(np.array_equal(seen, np.array(SFR.objects)), "testing second return value")
+    def test_two_signs_seen(self):
+        o1 = Buoy("red-sign", 4.0, 0.0, 0.0)
+        o2 = Buoy("green-sign", 8.0, 0.0, 0.0)
+        o3 = Buoy("green-sign", -2.0, 0.0, 0.0)
+        SFR.objects = [o3,o1,o2]
+        objs, seen = utils.filter_signs()
+        self.assertTrue(np.array_equal(objs, np.array(SFR.objects)), "testing first return value")
+        self.assertTrue(np.array_equal(seen, np.array(SFR.objects)), "testing second return value")
+    def test_multiple_signs(self):
+        o1 = Buoy("red-sign", 4.0, 0.0, 0.0)
+        o2 = Buoy("green-sign", 0.0, 0.0, 0.0)
+        o3 = Buoy("green-sign", -2.0, 0.0, 0.0)
+        o4 = Buoy("green-sign", -3.0, 0.0, 0.0)
+        SFR.objects = [o4,o3,o2,o1]
+        objs, seen = utils.filter_signs()
+        self.assertTrue(np.array_equal(objs, np.array(SFR.objects)), "testing first return value")
+        self.assertTrue(np.array_equal(seen, np.array(SFR.objects)), "testing second return value")
+    def test_duplicates(self):
+        o1 = Buoy("red-sign", 4.0, 0.0, 0.0)
+        o2 = Buoy("green-sign", -2.0, 0.0, 0.0)
+        o3 = Buoy("green-sign", -2.0, 0.0, 0.0)
+        o4 = Buoy("green-sign", -3.0, 0.0, 0.0)
+        SFR.objects = [o4,o2,o3,o1]
+        objs, seen = utils.filter_signs()
+        self.assertTrue(np.array_equal(objs, np.array(SFR.objects)), "testing first return value")
+        self.assertTrue(np.array_equal(seen, np.array(SFR.objects)), "testing second return value")
+        SFR.objects = [o4,o3,o2,o1]
+        objs, seen = utils.filter_signs()
+        self.assertTrue(np.array_equal(objs, np.array(SFR.objects)), "testing first return value")
+        self.assertTrue(np.array_equal(seen, np.array(SFR.objects)), "testing second return value")
+
+
 
 
 if __name__ == '__main__':
