@@ -7,14 +7,23 @@ The function get_yaw is adapted from https://stackoverflow.com/questions/5620744
 import src.SFR as SFR
 import numpy as np
 import time
+from src.buoys import Buoy
 
 
 def seen(o, s):
+    """
+    Checks if the boat has seen an object before.
+    Args:
+        o: Buoy class object defined in the local frame.
+        s: set() of Buoy class objects the boat has previously identified, defined in the global frame
+    Returns:
+        Boolean describing whether or not the object has been seen before. 
+        Note that we consider objects with the same label identified within 1 meter of each other as the same.
+    """
     for seen_o in s:
         if o.label == seen_o.label:
             global_o = np.array(map_to_global(o.x, o.y))
-            global_seen_o = np.array(map_to_global(seen_o.x, seen_o.y))
-            if np.sum(np.square(global_o - global_seen_o)) <= 1:
+            if np.sum(np.square(global_o - [seen_o.x, seen_o.y])) <= 1:
                 return True
 
     return False
@@ -30,8 +39,21 @@ def map_to_global(x, y):
     H = np.array([[np.cos(theta), -np.sin(theta), SFR.tx],
                   [np.sin(theta), np.cos(theta), SFR.ty],
                   [0, 0, 1]])
-    x, y, z = H @ np.array([x, y])
+    x, y, z = H @ np.array([x, y, 1.0])
     return [x/z, y/z]
+
+
+def map_to_global_Buoy(b):
+    """
+    Maps a Buoy object to the global frame.
+    Args:
+        b: Buoy object defined in the local frame
+    Returns:
+        global_b: Buoy object defined in the global frame 
+    """
+    x_global, y_global = map_to_global(b.x, b.y)
+    global_b = Buoy(b.label, x_global, y_global)
+    return global_b
 
 
 def get_midpoint(b1, b2):
@@ -194,7 +216,7 @@ def filter_correct_sign(previously_seen=[]):
         seen: seen objects
     """
     signs = np.array(
-        list(filter(lambda o: not (seen(o, previously_seen)) and o.label[0] == SFR.sign_color and o.label[3:] == "sign", SFR.objects)))
+        list(filter(lambda o: not (seen(o, previously_seen)) and o.label[0] == SFR.sign_color and o.label[-5:] == "thing", SFR.objects)))
     s = previously_seen + signs
 
     if signs.size == 1:
@@ -215,7 +237,7 @@ def filter_signs(previously_seen=[]):
     """
 
     signs = np.array(
-        list(filter(lambda o: not (seen(o, previously_seen)) and o.label[3:] == "sign", SFR.objects)))
+        list(filter(lambda o: not (seen(o, previously_seen)) and o.label[-4:] == "sign", SFR.objects)))
 
     # sort objects by axis
     if len(signs) > 0:
@@ -223,7 +245,7 @@ def filter_signs(previously_seen=[]):
         get_axis_vals = np.vectorize(get_attr)
         signs = signs[get_axis_vals(signs).argsort()]
 
-    s = previously_seen + signs
+    s = np.concatenate((previously_seen, signs))
 
     if signs.size > 1:
         return signs, s
