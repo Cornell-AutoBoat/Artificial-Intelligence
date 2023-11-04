@@ -4,7 +4,7 @@ This file contains the software for completing the Beaching & Turtle Inspection
 """
 from src.modes.tasks_enum import Task
 import src.SFR as SFR
-import src.control_tasks.utils as utils
+import tools.utils as utils
 import src.path_execution.pure_pursuit as pure_pursuit
 import numpy as np
 from src.modes.movement_modes_enum import Mode
@@ -89,7 +89,7 @@ def execute():
             rospy.loginfo("found sign: (" + str(s.x) + ", " + str(s.z) + ")")
         for s in targetSign:
             rospy.loginfo("found correct sign: (" +
-                         str(s.x) + ", " + str(s.z) + ")")
+                          str(s.x) + ", " + str(s.z) + ")")
         targetX = targetSign[0].x
         sideIndex = -1
         i = 0
@@ -105,7 +105,7 @@ def execute():
         sideSign = signs[sideIndex]
 
         rospy.loginfo("found sideSign: (" +
-                     str(sideSign.x) + ", " + str(sideSign.z) + ")")
+                      str(sideSign.x) + ", " + str(sideSign.z) + ")")
         waypoint = [utils.get_shifted_em(targetSign[0], sideSign, -1)]
         sL, sR = pure_pursuit.execute(waypoint)
 
