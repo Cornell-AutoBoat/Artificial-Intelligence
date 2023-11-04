@@ -4,7 +4,7 @@ Snack Run) Task.
 """
 import src.SFR as SFR
 import numpy as np
-import src.control_tasks.utils as utils
+import tools.utils as utils
 import src.path_execution.pure_pursuit as pure_pursuit
 from src.modes.tasks_enum import Task
 from src.modes.movement_modes_enum import Mode
@@ -18,7 +18,7 @@ def filter_buoys(objects):
 
     # buoys contains only green, red, blue buoys, yellow buoy
     buoys = np.array(list(filter(lambda b: b.label == "green-buoy" or b.label ==
-                     "red-buoy" or b.label == "blue-buoy", b.label == 'yellow-buoy', objects)))
+                                 "red-buoy" or b.label == "blue-buoy", b.label == 'yellow-buoy', objects)))
 
     # orders buoys by blue, green, red, yellow
     ordered_buoys = sorted(buoys, key=lambda o: o.label)
@@ -99,9 +99,9 @@ def create_waypoints():
 
         # create second waypoint
         wp2_x = (math.sqrt((a ** 2 + 1)*(t ** 2) - k ** 2 + (2*a*j+2*b)*k -
-                 ((a**2) * (j**2))-2*a*b*j - b**2) + (a*k) + j - a*b) / (a ** 2 + 1)
+                           ((a**2) * (j**2))-2*a*b*j - b**2) + (a*k) + j - a*b) / (a ** 2 + 1)
         wp2_z = (a * math.sqrt((a ** 2 + 1)*(t ** 2) - k ** 2 + (2*a*j+2*b)*k -
-                 ((a**2) * (j**2))-2*a*b*j - b**2) + (k*(a**2)) + a * j + b) / (a ** 2 + 1)
+                               ((a**2) * (j**2))-2*a*b*j - b**2) + (k*(a**2)) + a * j + b) / (a ** 2 + 1)
         waypoints.append(utils.map_to_global(wp2_x, wp2_z))
 
         # create third waypoint
@@ -110,9 +110,9 @@ def create_waypoints():
 
         # create fourth waypoint
         wp4_x = -(math.sqrt((a ** 2 + 1)*(t ** 2) - k ** 2 + (2*a*j+2*b)*k -
-                  ((a**2) * (j**2))-2*a*b*j - b**2) - (a*k) - j + a*b) / (a ** 2 + 1)
+                            ((a**2) * (j**2))-2*a*b*j - b**2) - (a*k) - j + a*b) / (a ** 2 + 1)
         wp4_z = -(a * math.sqrt((a ** 2 + 1)*(t ** 2) - k ** 2 + (2*a*j+2*b)*k -
-                  ((a**2) * (j**2))-2*a*b*j - b**2) - (k*(a**2)) - a * j - b) / (a ** 2 + 1)
+                                ((a**2) * (j**2))-2*a*b*j - b**2) - (k*(a**2)) - a * j - b) / (a ** 2 + 1)
         waypoints.append(utils.map_to_global(wp4_x, wp4_z))
 
         # create fifth waypoint

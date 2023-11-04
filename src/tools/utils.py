@@ -32,6 +32,11 @@ def seen(o, s):
 def map_to_global(x, y):
     """
     Maps a local coordinate to the global frame.
+    Args:
+        x: x coordinate defined locally
+        y: y coordinate defined locally
+    Returns:
+        [x, y]: a list where list[0] = globally defined x coordinate, list[1] = globally defined y coordinate
     """
     theta = SFR.heading - (np.pi/2)
     if theta < -np.pi:
@@ -177,7 +182,6 @@ def pivot_to_gate(s):
 
     # Search left then search right. Conditions: a gate buoy has not yet been
     # identified and we haven't turned 90 degrees (pi/2 radians)
-    thruster_utils.sendValue(1500, 1500)
     while time.time() - start < np.pi / 2:
         buoys, s = SFR.filter_buoys(["green_buoy", "red_buoy"], s)
         for b in buoys:

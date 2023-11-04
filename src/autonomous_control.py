@@ -21,7 +21,7 @@ def determine_task():
     # If the last task (explore reef) has been completed, exit out of main control loop
 
     if SFR.explore_reef_complete:
-        SFR.done = True
+        SFR.execution_done = True
     else:
         SFR.task = Task(SFR.task.value + 1).name
 
