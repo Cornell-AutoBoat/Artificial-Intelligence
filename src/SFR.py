@@ -9,7 +9,8 @@ from src.modes.tasks_enum import Task
 # Boat competition state variables.
 mode = Mode.REMOTE_CONTROL
 task = Task.BASIC_TASKS
-done = False
+execution_done = False
+pp_done = False
 
 # system_on and RS_on are written by the serial node
 
