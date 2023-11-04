@@ -59,7 +59,7 @@ def pivot():
         if len(buoys) == 1:
             # if only a green buoy is seen
             if buoys[0].label == "green-buoy":
-                while (not ((buoys[0] == "blue-buoy" or buoys[0] == "yellow-buoy") and buoys[1] == "green-buoy" and buoys[2] == "red-buoy")):
+                while (not ((buoys[0] == "blue-buoy" or buoys[0] == "yellow-buoy") and buoys[1] == "red-buoy" and buoys[2] == "green-buoy")):
                     sL, sR = thruster_utils.move_pivot("R")
                     buoys = filter_buoys(SFR.objects)
                     if (buoys[0] == "green-buoy" and buoys[1] == "red-buoy"):
@@ -69,7 +69,7 @@ def pivot():
                 thruster_utils.break_thrusters(sL, sR)
         # if only a red buoy is seen
             elif buoys[0].label == "red-buoy":
-                while (not ((buoys[0] == "blue-buoy" or buoys[0] == "yellow-buoy") and buoys[1] == "green-buoy" and buoys[2] == "red-buoy")):
+                while (not ((buoys[0] == "blue-buoy" or buoys[0] == "yellow-buoy") and buoys[1] == "red" and buoys[2] == "green-buoy")):
                     sL, sR = thruster_utils.move_pivot("L")
                     buoys = filter_buoys(SFR.objects)
                     if (buoys[0] == "green-buoy" and buoys[1] == "red-buoy"):
@@ -89,7 +89,7 @@ def pivot():
             sL, sR = 1450, 1550
             thruster_utils.sendValue(sL, sR)
             start = time.time()
-            while (not ((buoys[0] == "blue-buoy" or buoys[0] == "yellow-buoy") and buoys[1] == "green-buoy" and buoys[2] == "red-buoy")):
+            while (not ((buoys[0] == "blue-buoy" or buoys[0] == "yellow-buoy") and buoys[1] == "red-buoy" and buoys[2] == "green-buoy")):
                 buoys = filter_buoys(SFR.objects)
                 if time.time() - start > 20:
                     thruster_utils.break_thrusters(sL, sR)
@@ -99,6 +99,7 @@ def pivot():
                 utils.get_extended_midpoint(buoys[0], buoys[1], -1.75))
             thruster_utils.break_thrusters(sL, sR)
             buoys = filter_buoys(SFR.objects)
+        # if a yellow and red buoy are seen, but not a green
         if buoys[0].label == "yellow-buoy" and buoys[1].label == "red-buoy":
             sL, sR = 1450, 1550
             thruster_utils.sendValue(sL, sR)
@@ -134,14 +135,55 @@ def get_to_challenge():
     pure_pursuit.execute(utils.get_extended_buoy(buoys[0], t=3))
 
 
+def cal_point3():
+    waypoints = []
+    buoys = filter_buoys(SFR.objects)
+    buoy_radius = 0.184
+    boat_radius = 0.38
+    # yellow in front
+    while (len(buoys) < 2):
+        if len(buoys) == 1:
+            if (buoys[0] == 'yellow_buoy'):
+                while (not ((buoys[0] == "yellow_buoy") and buoys[1] == "blue_buoy")):
+                    sL, sR = 1450, 1550
+                    thruster_utils.sendValue(sL, sR)  # should move foward
+                    buoys = filter_buoys(SFR.objects)
+                if (buoys[0] == "yellow_buoy" and buoys[1] == "blue_buoy"):
+                    wp3 = utils.get_midpoint(buoys[0], buoys[1])
+                    waypoints.append(utils.map_to_global(wp3[0], wp3[1]))
+                    buoys = filter_buoys(SFR.objects)
+            elif (buoys[0] == 'blue_buoy'):
+                while (not ((buoys[0] == "blue_buoy") and buoys[1] == "yellow_buoy")):
+                    sL, sR = 1450, 1550
+                    thruster_utils.sendValue(sL, sR)  # should move foward
+                    buoys = filter_buoys(SFR.objects)
+                if (buoys[0] == "blue_buoy" and buoys[1] == "yellow_buoy"):
+                    wp3 = utils.get_extended_buoy(buoys[1], t=-3)
+                    waypoints.append(utils.map_to_global(wp3[0], wp3[1]))
+                    buoys = filter_buoys(SFR.objects)
+        elif len(buoys) == 2:
+            if (buoys[0] == "yellow_buoy" and buoys[1] == "blue_buoy"):
+                wp3 = utils.get_midpoint(buoys[0], buoys[1])
+                waypoints.append(utils.map_to_global(wp3[0], wp3[1]))
+                buoys = filter_buoys(SFR.objects)
+            elif buoys[0] == "blue_buoy" and buoys[1] == "yellow_buoy":
+                wp3 = utils.get_extended_buoy(buoys[1], t=-3)
+                waypoints.append(utils.map_to_global(wp3[0], wp3[1]))
+                buoys = filter_buoys(SFR.objects)
+
+    return waypoints
+
+
 def create_waypoints():
     # list of waypoints for the boat (6 total)
     waypoints = []
+    waypoints2 = []
     buoys = filter_buoys(SFR.objects)
     buoy_radius = 0.184
     boat_radius = 0.381
     safety1 = 0.3  # placeholder value
     safety2 = 1.5
+
     j = buoys[0].x
     k = buoys[0].y
     t = 2  # placeholder value for how far away we want the boat to be from the blue buoy
@@ -162,23 +204,24 @@ def create_waypoints():
 
         # create third waypoint
         wp3 = utils.get_extended_buoy(buoys[0], t=-3)
-        waypoints.append(utils.map_to_global(wp3[0], wp3[1]))
+        # waypoints.append(utils.map_to_global(wp3[0], wp3[1]))
 
         # create fourth waypoint
         wp4_x = -(math.sqrt((a ** 2 + 1)*(t ** 2) - k ** 2 + (2*a*j+2*b)*k -
                             ((a**2) * (j**2))-2*a*b*j - b**2) - (a*k) - j + a*b) / (a ** 2 + 1)
         wp4_y = -(a * math.sqrt((a ** 2 + 1)*(t ** 2) - k ** 2 + (2*a*j+2*b)*k -
                                 ((a**2) * (j**2))-2*a*b*j - b**2) - (k*(a**2)) - a * j - b) / (a ** 2 + 1)
-        waypoints.append(utils.map_to_global(wp4_x, wp4_y))
+
+        waypoints2.append(utils.map_to_global(wp4_x, wp4_y))
 
         # create fifth waypoint
         wp5 = utils.get_midpoint(buoys[1], buoys[2])
-        waypoints.append(utils.map_to_global(wp5[0], wp5[1]))
+        waypoints2.append(utils.map_to_global(wp5[0], wp5[1]))
 
         # create sixth waypoint
         wp6_x = SFR.ox
         wp6_y = SFR.oy
-        waypoints.append(utils.map_to_global(wp6_x, wp6_y))
+        waypoints2.append(utils.map_to_global(wp6_x, wp6_y))
         rospy.loginfo("j: " + str(j))
         rospy.loginfo("k: " + str(k))
         rospy.loginfo("a: " + str(a))
@@ -215,7 +258,7 @@ def create_waypoints():
         wp6_y = SFR.oy
         waypoints.append(utils.map_to_global(wp6_x, wp6_y))
 
-    return waypoints
+    return waypoints, waypoints2
 
 
 def execute():
@@ -227,7 +270,12 @@ def execute():
     pivot()
 
     waypoints = create_waypoints()
-    sL, sR = pure_pursuit.execute(waypoints)
+    first_path = waypoints[0]
+    final_path = waypoints[1]
+    sL, sR = pure_pursuit.execute(first_path)
+    third_point = cal_point3()
+    sL, sR = pure_pursuit.execute(third_point)
+    sL, sR = pure_pursuit.execute(final_path)
     thruster_utils.break_thrusters(sL, sR)
     for wp in waypoints:
         rospy.loginfo("determined waypoint: " + str(wp))
