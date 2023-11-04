@@ -4,10 +4,8 @@ Mandatory Navigation Channel) Task.
 """
 import src.SFR as SFR
 import numpy as np
-import src.control_tasks.utils as utils
-import src.path_execution.pure_pursuit as pure_pursuit
-import src.path_execution.thruster_utils as thruster_utils
-import src.path_execution.piecewise as piecewise
+from tools import utils
+from tools.path_processing import send_to_controls, process
 from src.modes.tasks_enum import Task
 import time
 import rospy
@@ -20,13 +18,6 @@ import rospy
 # LR  x  LG
 
 
-def backup():
-    w = [[SFR.tx, SFR.ty + 4.5]]
-    # sL, sR = pure_pursuit.execute(w, lookahead=2.0)
-    piecewise.follow(w)
-    thruster_utils.break_thrusters(sL, sR)
-
-
 def pivot(seen):
     # [[close red, close green], [far red, far green]]
     gates = np.array([[None, None], [None, None]])
@@ -34,8 +25,7 @@ def pivot(seen):
     # Search left then search right. Conditions: a gate buoy has not yet been
     # identified and we haven't turned 90 degrees (pi/4 radians)
     start = time.time()
-    sL, sR = 1450, 1550
-    thruster_utils.sendValue(sL, sR)
+    send_to_controls("pivot_l")
     while (not gates[0, 0] or not gates[0, 1]):
         if time.time() - start > 4:
             break
@@ -52,12 +42,11 @@ def pivot(seen):
                     gates[1, 0] = b
                 else:
                     gates[1, 1] = b
-    thruster_utils.break_thrusters(sL, sR)
+    send_to_controls("stop")
 
     if not gates[0, 0] or not gates[0, 1]:
         start = time.time()
-        sL, sR = 1550, 1450
-        thruster_utils.sendValue(sL, sR)
+        send_to_controls("pivot_r")
         while (not gates[0, 0] or not gates[0, 1]):
             if time.time() - start > 8:
                 break
@@ -74,12 +63,11 @@ def pivot(seen):
                         gates[1, 0] = b
                     else:
                         gates[1, 1] = b
-        thruster_utils.break_thrusters(sL, sR)
+        send_to_controls("stop")
 
     if not gates[0, 0] or not gates[0, 1]:
         start = time.time()
-        sL, sR = 1450, 1550
-        thruster_utils.sendValue(sL, sR)
+        send_to_controls("pivot_l")
         while (not gates[0, 0] or not gates[0, 1]):
             if time.time() - start > 4:
                 break
@@ -96,7 +84,7 @@ def pivot(seen):
                         gates[1, 0] = b
                     else:
                         gates[1, 1] = b
-        thruster_utils.break_thrusters(sL, sR)
+        send_to_controls("pivot_r")
 
     return gates, seen
 
@@ -117,9 +105,12 @@ def execute():
         mid_x2, mid_y2 = utils.get_extended_midpoint(buoys[2], buoys[3], t=3)
         waypoints.append(utils.map_to_global(mid_x1, mid_y1))
         waypoints.append(utils.map_to_global(mid_x2, mid_y2))
-        sL, sR = pure_pursuit.execute(waypoints)
-        time.sleep(1)
-        thruster_utils.break_thrusters(sL, sR)
+
+        path = process(waypoints)
+        send_to_controls("path", path)
+        while not SFR.pp_done:
+            pass
+        send_to_controls("stop")
         finish("SUCCESS")
     else:
         rospy.loginfo("can't see all buoys")
@@ -140,8 +131,11 @@ def execute():
                         mid_x, mid_y = utils.get_extended_midpoint(b1, b2)
                         waypoints.append(utils.map_to_global(mid_x, mid_y))
                         gates_passed += 1
-                sL, sR = pure_pursuit.execute(waypoints)
-        thruster_utils.break_thrusters(sL, sR)
+                path = process(waypoints)
+                send_to_controls("path", path)
+                while not SFR.pp_done:
+                    pass
+        send_to_controls("stop")
         finish("SUCCESS")
 
 
@@ -151,7 +145,7 @@ def finish(outcome):
         # mark task as complete
         SFR.panama_canal_complete = True
         SFR.task = Task.DETERMINE_TASK
-        SFR.done = True
+        SFR.execution_done = True
     else:
         # SFR.task = Task.EXPLORE_REEF_END
-        SFR.done = True
+        SFR.execution_done = True

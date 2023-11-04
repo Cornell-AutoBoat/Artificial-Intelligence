@@ -4,7 +4,7 @@ Snack Run) Task.
 """
 import src.SFR as SFR
 import numpy as np
-import src.control_tasks.utils as utils
+import tools.utils as utils
 import src.path_execution.pure_pursuit as pure_pursuit
 from src.modes.tasks_enum import Task
 from src.modes.movement_modes_enum import Mode
@@ -211,6 +211,7 @@ def create_waypoints():
                             ((a**2) * (j**2))-2*a*b*j - b**2) - (a*k) - j + a*b) / (a ** 2 + 1)
         wp4_y = -(a * math.sqrt((a ** 2 + 1)*(t ** 2) - k ** 2 + (2*a*j+2*b)*k -
                                 ((a**2) * (j**2))-2*a*b*j - b**2) - (k*(a**2)) - a * j - b) / (a ** 2 + 1)
+
         waypoints2.append(utils.map_to_global(wp4_x, wp4_y))
 
         # create fifth waypoint

@@ -4,9 +4,9 @@ This file contains the software for completing the Explore the Coral Reef
 """
 from src.modes.tasks_enum import Task
 import numpy as np
-from src.control_tasks.utils import get_yaw, filter_objects, get_midpoint, map_to_global
+from tools.utils import get_yaw, filter_objects, get_midpoint, map_to_global
 import src.SFR as SFR
-from src.control_tasks.a_star import get_waypoints
+from tools.a_star import get_waypoints
 from src.path_execution import pure_pursuit
 from src.path_execution import thruster_utils
 import time
@@ -45,7 +45,7 @@ def start():
     SFR.task = Task.DETERMINE_TASK
 
 
-def execute_end(repeat = True):
+def execute_end(repeat=True):
     # Use A* to navigate through gate
     # Get the current coordinates
 

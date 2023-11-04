@@ -4,14 +4,11 @@ Main control sequence. Determines movement mode, then loops until competition
 course has been completed.
 """
 
-import autonomous_control
-import SFR
+from src import autonomous_control, SFR
 from src.modes.movement_modes_enum import Mode
 import rospy
 import numpy as np
-from src.control_tasks import utils
 import time
-from src.control_tasks import basic_tasks
 
 from test.msg import ZEDdata, State, SensorReadings, MotionPlans, Done
 
@@ -47,7 +44,7 @@ def callback_state(msg):
 
 
 def callback_done(msg):
-    pass
+    SFR.pp_done = msg.done
 
 
 if __name__ == "__main__":
@@ -59,10 +56,11 @@ if __name__ == "__main__":
     pub = rospy.Publisher('motion-plans', MotionPlans, queue_size=10)
     SFR.mcPub = pub
     time.sleep(3)
-    while not SFR.done and not rospy.is_shutdown():
+    while not SFR.execution_done and not rospy.is_shutdown():
         main_control_loop()
 
     rospy.loginfo(
         "\\\\\\\\\\\\\\\\\\\\\\\\\\finished main control loop\\\\\\\\\\\\\\\\\\\\\\\\\\")
 
-    # thruster_utils.kill_system()
+    # Until ros is shutdown, spin and wait for callbacks to be evoked
+    rospy.spin()

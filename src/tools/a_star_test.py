@@ -1,4 +1,4 @@
-from src.control_tasks.a_star import get_waypoints
+from a_star import get_waypoints
 
 # TODO: make an actual test file with pytest
 
