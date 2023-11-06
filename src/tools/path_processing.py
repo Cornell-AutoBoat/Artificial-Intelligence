@@ -1,6 +1,7 @@
 import numpy as np
 import math
 from src import SFR
+from visualizations import path_visualizer
 from test.msg import List, MotionPlans
 
 
@@ -139,6 +140,9 @@ def process(waypoints):
 
     # Convert to List[]
     path = convert_to_msg_type(path)
+
+    # UNCOMMENT FOR VISUALIZATIONS!! Change field size according to buoy placement
+    # path_visualizer(waypoints, path, (1, 1), (-10, -5, 10, 20))
 
     return path
 

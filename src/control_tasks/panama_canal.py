@@ -4,8 +4,8 @@ Mandatory Navigation Channel) Task.
 """
 import src.SFR as SFR
 import numpy as np
-from tools import utils
-from tools.path_processing import send_to_controls, process
+from src.tools import utils
+from src.tools.path_processing import send_to_controls, process
 from src.modes.tasks_enum import Task
 import time
 import rospy

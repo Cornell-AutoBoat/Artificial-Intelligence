@@ -81,4 +81,4 @@ def path_visualizer(orig_path, new_path, fig_size, field_size):
                  color='green', markersize=15, label='end')
     path_ax.legend()
 
-    plt.savefig('../src/motor_control/path.png')
+    plt.savefig('path.png')
