@@ -48,8 +48,8 @@ def callback_done(msg):
 
 
 if __name__ == "__main__":
-    rospy.init_node('listener', anonymous=True)
-    rospy.Subscriber('chatter', ZEDdata, callback_zed)
+    rospy.init_node('AINode', anonymous=True)
+    rospy.Subscriber('zed-data', ZEDdata, callback_zed)
     rospy.Subscriber('alive_auto', State, callback_state)
     rospy.Subscriber('sensors', SensorReadings, callback_sensors)
     rospy.Subscriber('done', Done, callback_done)

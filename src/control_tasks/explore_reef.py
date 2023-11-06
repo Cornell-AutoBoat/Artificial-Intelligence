@@ -4,11 +4,9 @@ This file contains the software for completing the Explore the Coral Reef
 """
 from src.modes.tasks_enum import Task
 import numpy as np
-from tools.utils import get_yaw, filter_objects, get_midpoint, map_to_global
+from src.tools.utils import get_yaw, filter_objects, get_midpoint, map_to_global
 import src.SFR as SFR
 from tools.a_star import get_waypoints
-from src.path_execution import pure_pursuit
-from src.path_execution import thruster_utils
 import time
 
 

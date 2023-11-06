@@ -1,10 +1,8 @@
-from tools.utils import filter_objects, get_midpoint, map_to_global, get_extended_midpoint
+from src.tools.utils import filter_objects, get_midpoint, map_to_global, get_extended_midpoint
 import src.SFR as SFR
-from src.path_execution import pure_pursuit
-from tools.a_star import get_waypoints
+from src.tools.a_star import get_waypoints
 import numpy as np
 from src.modes.tasks_enum import Task
-from src.path_execution import thruster_utils
 import rospy
 from src.buoys import Buoy
 import time

@@ -4,11 +4,9 @@ Snack Run) Task.
 """
 import src.SFR as SFR
 import numpy as np
-import tools.utils as utils
-import src.path_execution.pure_pursuit as pure_pursuit
+import src.tools.utils as utils
 from src.modes.tasks_enum import Task
 from src.modes.movement_modes_enum import Mode
-import src.path_execution.thruster_utils as thruster_utils
 import rospy
 import math
 

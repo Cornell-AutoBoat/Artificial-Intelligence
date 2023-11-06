@@ -1,7 +1,7 @@
 import src.SFR as SFR
-import tools.utils as utils
-from tools.a_star import get_waypoints
-from tools.path_processing import process, send_to_controls
+import src.tools.utils as utils
+from src.tools.a_star import get_waypoints
+from src.tools.path_processing import process, send_to_controls
 from src.buoys import Buoy
 import src.control_tasks.northern_passage as northern_passage
 import numpy as np

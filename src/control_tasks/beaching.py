@@ -4,12 +4,10 @@ This file contains the software for completing the Beaching & Turtle Inspection
 """
 from src.modes.tasks_enum import Task
 import src.SFR as SFR
-import tools.utils as utils
-import src.path_execution.pure_pursuit as pure_pursuit
+import src.tools.utils as utils
 import numpy as np
 from src.modes.movement_modes_enum import Mode
 import rospy
-import src.path_execution.thruster_utils as thruster_utils
 import time
 
 
