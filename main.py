@@ -62,5 +62,3 @@ if __name__ == "__main__":
     rospy.loginfo(
         "\\\\\\\\\\\\\\\\\\\\\\\\\\finished main control loop\\\\\\\\\\\\\\\\\\\\\\\\\\")
 
-    # Until ros is shutdown, spin and wait for callbacks to be evoked
-    rospy.spin()
