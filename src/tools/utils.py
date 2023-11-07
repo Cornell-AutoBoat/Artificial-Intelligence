@@ -84,7 +84,8 @@ def get_extended_midpoint(b1, b2, t=1):
         b1: competition object.
         b2: competition object.
         t: desired meters midpoint will be extended. 
-        t > 0: extended away from boat. t < 0: extended closer to boat.
+        t > 0: extended closer to the boat. t < 0: extended away from the boat.
+        (the point will always be perpendicular to the line of the buoys)
     Returns:
         [x, y]: list corresponding to the local x, y coords of the ext. midpt.
     """
@@ -109,6 +110,8 @@ def get_shifted_em(obj1, obj2, t=3):
         obj1: competition object. Point returned will be in line with obj1.
         obj2: competition object.
         t: desired meters obj1 will be extended.
+        t > 0: extended closer to the boat. t < 0: extended away from the boat.
+        (the point will always be perpendicular to the line of the buoys)
     Returns:
         [x, y]: list corresponding to the local x, y coords of the shifted ext. midpt.
     """
