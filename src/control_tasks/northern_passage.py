@@ -292,3 +292,16 @@ def finish(outcome):
         # SFR.mode = Mode.REMOTE_CONTROL
         SFR.northern_passage_complete = True
         SFR.task = Task.DETERMINE_TASK
+
+
+def path_obstruction(global_path):
+    buoys = filter_buoys(SFR.objects)
+    # while (SFR.pp done = false)
+    # while task not done : (while the boat position is not at waypoint 6 )
+    # while blue buoy not seen
+    while (buoys[0] != 'blue_buoy'):
+        # follow path
+        buoys = filter_buoys(SFR.objects)
+        # filter buoy to see blue
+    # edit path
+    # send path to control.
