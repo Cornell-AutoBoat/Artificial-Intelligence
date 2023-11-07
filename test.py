@@ -260,6 +260,7 @@ class TestGetExtendedMidpoint(unittest.TestCase):
     SFR.tx = 0
     SFR.tz = 0
     SFR.ty = 0
+    SFR.heading = np.pi/2 
 
     def test_basic_midpoint_functionality(self):
         o1 = Buoy("red-buoy", 0.0, 1.0, 0.0)
@@ -268,8 +269,21 @@ class TestGetExtendedMidpoint(unittest.TestCase):
         y = 1.5
         self.assertEqual(utils.get_extended_midpoint(
             o1, o2, t=1), [x, y], "did not find midpoint")
+    
+    SFR.heading = 0
+    
+    
+    def test_heading_on_basic_midpoint_functionality(self): 
+        o1 = Buoy("red-buoy", 0.0, 1.0, 0.0)
+        o2 = Buoy("green-buoy", 0.0, 2.0, 0.0)
+        x = -1
+        y = 1.5
+        self.assertEqual(utils.get_extended_midpoint(
+            o1, o2, t=1), [x, y], "did not find midpoint")
+    
 
-    def test_midpoint_same_point(self):
+
+    def testing_the_same_point(self):
         o1 = Buoy("red-buoy", 0.0, 1.0, 0.0)
         o2 = Buoy("green-buoy", 0.0, 1.0, 0.0)
         x = -1
@@ -281,7 +295,7 @@ class TestGetExtendedMidpoint(unittest.TestCase):
     SFR.tz = 0
     SFR.ty = 1
 
-    def test_midpoint_same_point(self):
+    def test_of_two_positive_points(self):
         o1 = Buoy("red-buoy", 1.0, 5.0, 0.0)
         o2 = Buoy("green-buoy", 5.0, 1.0, 0.0)
         x = 4
@@ -289,7 +303,7 @@ class TestGetExtendedMidpoint(unittest.TestCase):
         self.assertEqual(utils.get_extended_midpoint(
             o1, o2, t=1), [x, y], "same point")
 
-    def test_midpoint_same_point(self):
+    def test_negative_and_positive_points(self):
         o1 = Buoy("red-buoy", -1.0, 1.0, 0.0)
         o2 = Buoy("green-buoy", 1.0, 1.0, 0.0)
         x = 0
@@ -297,7 +311,7 @@ class TestGetExtendedMidpoint(unittest.TestCase):
         self.assertEqual(utils.get_extended_midpoint(
             o1, o2, t=0), [x, y], "same point")
 
-    def test_midpoint_same_point(self):
+    def test_all_negative_points(self):
         o1 = Buoy("red-buoy", -2.0, -2.0, 0.0)
         o2 = Buoy("green-buoy", -3.0, -2.0, 0.0)
         x = -2.5
@@ -310,18 +324,31 @@ class TestGetShiftedExtendedMidpoint(unittest.TestCase):
     SFR.tx = 0
     SFR.tz = 0
     SFR.ty = 0
+    SFR.heading = np.pi/2 
 
    # o1, o2
-    def test_basic_shifted_functionality_2points(self):
+    def test_basic_shifted_functionality(self):
         o1 = Buoy("red-buoy", 1.0, 1.0, 0.0)
         o2 = Buoy("green-buoy", 1.0, 3.0, 0.0)
         x = 2
         y = 1
         self.assertEqual(utils.get_shifted_em(o1, o2, t=-1),
                          [x, y], "did not find midpoint")
+    
+    SFR.heading = 0
+    
+    def test_heading_effect_on_shifted_midpoint(self):
+        o1 = Buoy("red-buoy", 1.0, 1.0, 0.0)
+        o2 = Buoy("green-buoy", 1.0, 3.0, 0.0)
+        x = 2
+        y = 1
+        self.assertEqual(utils.get_shifted_em(o1, o2, t=-1),
+                         [x, y], "did not find midpoint")
+    
+    SFR.heading = np.pi/2 
 
-    # o2,01
-    def test_basic_shifted_functionality_2points(self):
+    
+    def test_all_positive_points_shifted_functionality(self):
         o1 = Buoy("red-buoy", 1.0, 1.0, 0.0)
         o2 = Buoy("green-buoy", 1.0, 3.0, 0.0)
         x = 2
@@ -329,7 +356,7 @@ class TestGetShiftedExtendedMidpoint(unittest.TestCase):
         self.assertEqual(utils.get_shifted_em(o2, o1, t=-1),
                          [x, y], "did not find midpoint")
 
-    def test_basic_shifted_functionality_2points(self):
+    def test_negative_and_positive_points_shifted_functionality(self):
         o1 = Buoy("red-buoy", -3.0, 3.0, 0.0)
         o2 = Buoy("green-buoy", -3.0, -3.0, 0.0)
         x = -6
@@ -337,7 +364,7 @@ class TestGetShiftedExtendedMidpoint(unittest.TestCase):
         self.assertEqual(utils.get_shifted_em(o1, o2, t=3),
                          [x, y], "did not find midpoint")
 
-    def test_midpoint_same_point(self):
+    def test_same_point_shifted_functionality(self):
         o1 = Buoy("red-buoy", 0.0, 1.0, 0.0)
         o2 = Buoy("green-buoy", 0.0, 1.0, 0.0)
         x = 0
