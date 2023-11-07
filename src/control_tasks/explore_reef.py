@@ -6,7 +6,7 @@ from src.modes.tasks_enum import Task
 import numpy as np
 from src.tools.utils import get_yaw, filter_objects, get_midpoint, map_to_global
 import src.SFR as SFR
-from tools.a_star import get_waypoints
+from src.tools.a_star import get_waypoints
 import time
 
 
