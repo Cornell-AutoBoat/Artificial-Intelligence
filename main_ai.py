@@ -16,9 +16,9 @@ from test.msg import ZEDdata, State, SensorReadings, MotionPlans, Done
 def main_control_loop():
     rospy.loginfo("entering main control loop")
     # stall while the system is off or remote control is on
-    print(SFR.system_on)
-    print(SFR.RC_on)
-    while (not SFR.system_on) or SFR.RC_on:
+    print(SFR.alive)
+    print(SFR.autonomous)
+    while (not SFR.alive) or (not SFR.autonomous):
         pass
 
     # Once mode autonomous, call autonomous execute
@@ -49,11 +49,11 @@ def callback_done(msg):
 
 if __name__ == "__main__":
     rospy.init_node('AINode', anonymous=True)
-    rospy.Subscriber('zed-data', ZEDdata, callback_zed)
+    rospy.Subscriber('zed_data', ZEDdata, callback_zed)
     rospy.Subscriber('alive_auto', State, callback_state)
     rospy.Subscriber('sensors', SensorReadings, callback_sensors)
     rospy.Subscriber('done', Done, callback_done)
-    pub = rospy.Publisher('motion-plans', MotionPlans, queue_size=10)
+    pub = rospy.Publisher('motion_plans', MotionPlans, queue_size=10)
     SFR.mcPub = pub
     time.sleep(3)
     while not SFR.execution_done and not rospy.is_shutdown():
