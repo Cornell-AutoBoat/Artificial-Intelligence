@@ -26,6 +26,7 @@ def test_send_signals_lin():
     # move straight at 1 m/s for 3 seconds
     print("start")
     send_to_controls("fwd")
+    time.sleep(2)
     print("stop")
     send_to_controls("stop")
 
@@ -434,9 +435,9 @@ def execute():
     # test_kill()
     # test_tmx()
     # test_auto_mode()
-    # test_send_signals_lin()
+    test_send_signals_lin()
     # test_send_signals_ang()
-    test_move_straight()
+    # test_move_straight()
     # test_move_side()
     # test_circle_around()
     # test_hit_buoy()

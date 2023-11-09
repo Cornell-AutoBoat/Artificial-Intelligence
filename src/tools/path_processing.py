@@ -1,7 +1,7 @@
 import numpy as np
 import math
 from src import SFR
-from visualizations import path_visualizer
+from src.tools.visualizations import path_visualizer
 from test.msg import List, MotionPlans
 
 

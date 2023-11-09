@@ -16,11 +16,11 @@ pp_done = False
 
 # Indictates if the remote kill switch has been activated. If False, it has been
 # activated and system is off (i.e. no power will be sent to motors)
-system_on = True
+alive = True
 
-# Indicates if the RC knob on the remote controller has been turned on. If True,
-# our code should stall. If False, autonomous mode is activated and our code will run
-RC_on = True
+# Indicates if the RC knob on the remote controller has been turned on. If False,
+# our code should stall. If True, autonomous mode is activated and our code will run
+autonomous = False
 
 # Values to be sent to the left and right thrusters
 sL = 1500
