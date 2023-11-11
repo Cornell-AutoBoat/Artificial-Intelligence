@@ -124,14 +124,14 @@ def get_extended_buoy(b, t=3):
     """
     Returns the local coordinates of a point (x, y) t meters away from buoy b.
     The point will lie on the line intersecting the local coordinates of b and 
-    the boat.
-    Args:
+    the boat. A positive t value implies extension in the direction toward the origin 
+    and a negative t value implies extension in the direction away from the buoy. 
         b: buoy object.
         t: desired meters away from the buoy.
     Returns:
         [x, y]: list corresponding to the local coordinates of the point extended t from b
     """
-    ext = t/np.sqrt(b.x**2 + b.y**2)
+    ext = t/(np.sqrt(b.x**2 + b.y**2))
     x = (1 - ext) * b.x
     y = (1 - ext) * b.y
     return [x, y]

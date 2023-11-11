@@ -7,8 +7,10 @@ import numpy as np
 import src.tools.utils as utils
 from src.modes.tasks_enum import Task
 from src.modes.movement_modes_enum import Mode
+from src.tools.path_processing import send_to_controls, process
 import rospy
 import math
+import time
 
 
 # def filter_buoys(objects):
@@ -292,3 +294,42 @@ def finish(outcome):
         # SFR.mode = Mode.REMOTE_CONTROL
         SFR.northern_passage_complete = True
         SFR.task = Task.DETERMINE_TASK
+
+
+def avoid_intersection(blue_buoy, path, avoidance_length=1):
+    for i, (x, y) in enumerate(path):
+        if blue_buoy.x == x and blue_buoy.y == y:
+            path[i] = (x + avoidance_length, y + avoidance_length)
+            print(f"Adjusted path at index {i} to avoid intersection.")
+            return path
+        else:
+            continue
+
+
+def path_obstruction(global_path):
+    buoys = filter_buoys(SFR.objects)
+    new_path = process(global_path)
+    while (SFR.pp_done == False):
+        while (buoys[0] != "blue_buoy"):
+            buoys = filter_buoys(SFR.objects)
+            edited_path = avoid_intersection(buoys[0], new_path, 1)
+            smooth_edited_path = process(edited_path)
+            send_to_controls("path", smooth_edited_path)
+            time.sleep(0.1)
+            while not SFR.pp_done:
+                pass
+            send_to_controls("stops")
+
+            # check any intersection
+            #
+            # modify the path
+            # send the modified path to control
+
+            # while task not done : (while the boat position is not at waypoint 6 )
+            # while blue buoy not seen
+            # while (buoys[0] != 'blue_buoy'):
+            # follow path
+            # buoys = filter_buoys(SFR.objects)
+            # filter buoy to see blue
+            # edit path
+            # send path to control.
