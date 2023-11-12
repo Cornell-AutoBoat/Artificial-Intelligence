@@ -250,7 +250,93 @@ class TestMapToGlobal(unittest.TestCase):
 
 
 class TestGetMidpoint(unittest.TestCase):
-    pass
+    SFR.tx = 0
+    SFR.ty=0
+    SFR.heading = np.pi/2
+
+    def test_get_midpoint_both_origin(self):
+        o1 = Buoy("test-buoy1", 0.0, 0.0, 0.0)
+        o11 = Buoy("test-buoy11", 0.0, 0.0, 0.0)
+        mid1 = [0.0, 0.0]
+        self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
+
+    def test_get_midpoint_one_origin_one_not_origin(self):
+        o1 = Buoy("test-buoy1", 0.0, 0.0, 0.0)
+        o11 = Buoy("test-buoy11", 1.0, 2.0, 0.0)
+        mid1 = [0.5, 1.0]
+        self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
+
+    def test_get_midpoint_both_not_at_origin(self):
+        o1 = Buoy("test-buoy1", 5.0, 2.0, 0.0)
+        o11 = Buoy("test-buoy11", 1.0, 2.0, 0.0)
+        mid1 = [3.0, 2.0]
+        self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
+
+    def test_get_midpoint_two_close_points(self):
+        o1 = Buoy("test-buoy1", 5.22, 3.2, 0.0)
+        o11 = Buoy("test-buoy11", 5.2, 3.0, 0.0)
+        mid1 = [5.21, 3.1]
+        self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
+
+    def test_get_midpoint_two_far_points(self):
+        o1 = Buoy("test-buoy1", 3.1, 2.1, 0.0)
+        o11 = Buoy("test-buoy11", 1000.2, 20000.1, 0.0)
+        mid1 = [501.65, 10001.1]
+        self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
+
+    def test_get_midpoint_q1_q2(self): 
+        o1 = Buoy("test-buoy1", 3.1, 2.1, 0.0)
+        o11 = Buoy("test-buoy11", -1000.2, 20000.1, 0.0)
+        mid1 = [-498.55, 10001.1]
+        self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
+
+    def test_get_midpoint_q1_q3(self):
+        o1 = Buoy("test-buoy1", 3.1, 2.1, 0.0)
+        o11 = Buoy("test-buoy11", -1000.2, -20000.1, 0.0)
+        mid1 = [-498.55, -9999]
+        self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
+
+    def test_get_midpoint_q1_q4(self): 
+        o1 = Buoy("test-buoy1", 3.1, 2.1, 0.0)
+        o11 = Buoy("test-buoy11", 1000.2, -20000.1, 0.0)
+        mid1 = [501.65, -9999]
+        self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
+
+    def test_get_midpoint_q2_q2(self):
+        o1 = Buoy("test-buoy1", -3.1, 2.1, 0.0)
+        o11 = Buoy("test-buoy11", -1000.2, 20000.1, 0.0)
+        mid1 = [-501.65, 10001.1]
+        self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
+
+    def test_get_midpoint_q2_q3(self):
+        o1 = Buoy("test-buoy1", -3.1, 2.1, 0.0)
+        o11 = Buoy("test-buoy11", -1000.2, -20000.1, 0.0)
+        mid1 = [-501.65, -9999]
+        self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
+
+    def test_get_midpoint_q2_q4(self):
+        o1 = Buoy("test-buoy1", -3.1, 2.1, 0.0)
+        o11 = Buoy("test-buoy11", 1000.2, -20000.1, 0.0)
+        mid1 = [498.55, -9999]
+        self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
+
+    def test_get_midpoint_q3_q3(self): 
+        o1 = Buoy("test-buoy1", -3.1, -2.1, 0.0)
+        o11 = Buoy("test-buoy11", -1000.2, -20000.1, 0.0)
+        mid1 = [-501.65, -10001.1]
+        self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
+
+    def test_get_midpoint_q3_q4(self):
+        o1 = Buoy("test-buoy1", -3.1, -2.1, 0.0)
+        o11 = Buoy("test-buoy11", 1000.2, -20000.1, 0.0)
+        mid1 = [498.55, -10001.1]
+        self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
+
+    def test_get_midpoint_q4_q4(self): 
+        o1 = Buoy("test-buoy1", 3.1, -2.1, 0.0)
+        o11 = Buoy("test-buoy11", 1000.2, -20000.1, 0.0)
+        mid1 = [501.65, -10001.1]
+        self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
 
 
 class TestGetExtendedMidpoint(unittest.TestCase):
@@ -407,7 +493,84 @@ class TestGetYaw(unittest.TestCase):
 
 
 class TestFilterObjects(unittest.TestCase):
-    pass
+    def test_one_labeled_object(self):
+        #also test not aligned 
+        #set these to other values 
+        SFR.tx = 0
+        SFR.ty = 0
+        SFR.heading = np.pi/2
+        SFR.objects = [Buoy("red_buoy",0,0), Buoy("blue_buoy", 0,5)]
+        labels = ["red_buoy", "green_buoy"]
+        o1 = Buoy("red_buoy", 0,0) #not aligned - ex. map_to_global_Buoy(o1)
+        o2 = Buoy("blue_buoy", 0,5)
+        #previously_seen = {}  
+        #new_objects = {o1,o2}
+        #new_correct_objects = [o1]
+        new_correct_obj, seen_obj = utils.filter_objects(labels, {}, 'y')
+        #s = {o1,o2}
+        self.assertEqual(new_correct_obj, np.array([o1]))
+        self.assertEqual(seen_obj, {o1,o2})
+
+    def test_one_labeled_object_unaligned(self):
+        #Local frame not aligned with global grame
+        SFR.tx = 5
+        SFR.ty = 3
+        SFR.heading = np.pi
+        SFR.objects = [Buoy("red_buoy",0,0), Buoy("blue_buoy", 0,5)]
+        labels = ["red_buoy", "green_buoy"]
+        o1 = utils.map_to_global_Buoy(Buoy("red_buoy", 0,0)) #not aligned - ex. map_to_global_Buoy(o1)
+        o2 = utils.map_to_global_Buoy(Buoy("blue_buoy", 0,5))
+        #previously_seen = {}  
+        #new_objects = {o1,o2}
+        #new_correct_objects = [o1]
+        new_correct_obj, seen_obj = utils.filter_objects(labels, {}, 'y')
+        #s = {o1,o2}
+        self.assertEqual(new_correct_obj, np.array([o1]))
+        self.assertEqual(seen_obj, {o1,o2})
+
+    def test_no_labeled_object(self):
+        SFR.tx = 0
+        SFR.ty = 0
+        SFR.heading = np.pi/2
+        SFR.objects = [Buoy("red_buoy", 0,0,0), Buoy("blue_buoy", 0,5,0)]
+        labels = ["red_buoy", "green_buoy"]
+        o1 = Buoy("red_buoy", 0,0,0) #utils.map_to_global(0,0)[0], utils.map_to_global(0,0)[1], 0 
+        o2 = Buoy("blue_buoy", 0,5,0)
+        previously_seen = {o1} 
+        #new_objects = {o2}
+        #new_correct_objects = []
+        new_correct_obj, seen_obj = utils.filter_objects(labels, previously_seen, 'y')
+        #s = {o1,o2}
+        self.assertEqual(new_correct_obj, np.array([]))
+        self.assertEqual(seen_obj, {o1,o2})
+
+    def test_y_axis_sorted(self):
+        #y-axis sorting
+        SFR.objects = [Buoy("blue_buoy", 0,5,0) , Buoy("red_buoy", 0,0,0)]
+        labels = ["red_buoy", "green_buoy"]
+        o1 = Buoy("red_buoy", 0,0,0)
+        o2 = Buoy("blue_buoy", 0,5,0)
+        previously_seen = {}
+        #new_objects = {o1,o2}
+        #new_correct_objects = [o1]
+        new_correct_obj, seen_obj = utils.filter_objects(labels, previously_seen, 'y')
+        #s = {o1,o2}
+        #sort o1, o2 manually 
+        self.assertEqual(new_correct_obj, np.array([o1,o2]))
+
+    def test_x_axis_sorted(self):
+        #x-axis sorting
+        SFR.objects = [Buoy("blue_buoy", 5,0,0) , Buoy("red_buoy", 0,0,0)]
+        labels = ["red_buoy", "green_buoy"]
+        o1 = Buoy("red_buoy", 0,0,0)
+        o2 = Buoy("blue_buoy", 5,0,0)
+        previously_seen = {}
+        #new_objects = {o1,o2}
+        #new_correct_objects = [o1]
+        new_correct_obj, seen_obj = utils.filter_objects(labels, previously_seen, 'y')
+        #s = {o1,o2}
+        #sort o1, o2 manually 
+        self.assertEqual(new_correct_obj, np.array([o1,o2]))
 
 
 class TestFilterCorrectSign(unittest.TestCase):
