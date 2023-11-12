@@ -143,30 +143,42 @@ def filter_objects(labels, previously_seen=[],  axis='y'):
     the objects by specified axis, and keeps track of objects already seen.
     Args:
         labels: list of strings.
-        previously_seen: set.
+        previously_seen: set of objects in the global frame.
         axis: one of 'x', 'y', or 'z'.
     Returns:
-        objs: sorted numpy array of objects.
-        seen: the updated set of objects seen.
+        objs: sorted numpy array of objects in the global frame.
+        seen: the updated set of objects seen in the global frame.
     """
 
-    # objs only has objects with a label in labels
     objs = np.array(
-        list(filter(lambda o: not (seen(o, previously_seen)) and o.label in labels, SFR.objects)))
+       list(filter(lambda o: not (seen(o, previously_seen)), SFR.objects)))
+   #maybe delete this part: and o.label in labels
+   #new correct objects:
+   #want to filter new_objs to get only objects with labels in label
+    obj_corr = np.array(
+       list(filter(lambda o: o.label in labels), objs))
+  
+   # if we see no objects that fit criteria return empty set
+    if not np.all(obj_corr):
+       return np.array([]), previously_seen
 
-    # if we see no objects that fit criteria return empty set
-    if not np.all(objs):
-        return np.array([]), previously_seen
+   # sort objects by axis
+    if len(obj_corr) > 0:
+       def get_attr(o): return getattr(o, axis)
+       get_axis_vals = np.vectorize(get_attr)
+       objs = objs[get_axis_vals(objs).argsort()]
 
-    # sort objects by axis
-    if len(objs) > 0:
-        def get_attr(o): return getattr(o, axis)
-        get_axis_vals = np.vectorize(get_attr)
-        objs = objs[get_axis_vals(objs).argsort()]
+    global_obj = []
+    for obj in objs: 
+        global_corr = map_to_global(obj.x,obj.y)
+        o1 = Buoy(global_corr[0], global_corr[0])
+        global_obj.append(o1)
 
-    s = np.concatenate((previously_seen, objs))
+    for obj in global_obj:
+       previously_seen.add(obj)
 
-    return objs, s
+    return obj_corr, previously_seen
+
 
 
 def pivot_to_gate(s):
