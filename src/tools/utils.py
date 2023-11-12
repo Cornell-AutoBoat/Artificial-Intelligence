@@ -147,7 +147,7 @@ def filter_objects(labels, previously_seen=[],  axis='y'):
         previously_seen: set of objects in the global frame.
         axis: one of 'x', 'y', or 'z'.
     Returns:
-        objs: sorted numpy array of objects in the global frame.
+        objs: sorted numpy array of objects in the local frame.
         seen: the updated set of objects seen in the global frame.
     """
 
