@@ -137,8 +137,6 @@ def get_extended_buoy(b, t=3):
     return [x, y]
 
 
-
-
 def filter_objects(labels, previously_seen=[],  axis='y'):
     """
     Filter objects array to contain only objects with a label in labels, sorts 
@@ -154,7 +152,7 @@ def filter_objects(labels, previously_seen=[],  axis='y'):
 
     objs = np.array(
        list(filter(lambda o: not (seen(o, previously_seen)), SFR.objects)))
-
+   #maybe delete this part: and o.label in labels
    #new correct objects:
    #want to filter new_objs to get only objects with labels in label
     obj_corr = np.array(
