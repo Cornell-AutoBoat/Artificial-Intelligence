@@ -16,3 +16,4 @@ class Task(Enum):
     EXPLORE_REEF_END = 6
     BASIC_TASKS = 9
     PID_TUNE = 10
+    TASKS_VISUALIZATION = 11
