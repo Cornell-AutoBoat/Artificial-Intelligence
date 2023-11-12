@@ -220,8 +220,8 @@ def filter_correct_sign(previously_seen=[]):
         seen: seen objects
     """
     signs = np.array(
-        list(filter(lambda o: not (seen(o, previously_seen)) and o.label[0] == SFR.sign_color and o.label[-5:] == "thing", SFR.objects)))
-    s = previously_seen + signs
+        list(filter(lambda o: not (seen(o, previously_seen)) and o.label[0] == SFR.sign_color and o.label[-4:] == "sign", SFR.objects)))
+    s = np.concatenate((previously_seen, signs))
 
     if signs.size == 1:
         return signs, s
@@ -236,10 +236,9 @@ def filter_signs(previously_seen=[]):
     Args:
         previously_seen: set.
     Returns:
-        objs: sorted numpy array of signs
-        seen: seen objects
+        objs: sorted numpy array of signs, (local)
+        seen: seen objects, (global)
     """
-
     signs = np.array(
         list(filter(lambda o: not (seen(o, previously_seen)) and o.label[-4:] == "sign", SFR.objects)))
 
@@ -255,3 +254,23 @@ def filter_signs(previously_seen=[]):
         return signs, s
     else:
         return np.array([]), previously_seen
+
+
+    # not_seen_objs = np.array(
+    #     list(filter(lambda o: not (seen(o, previously_seen)), SFR.objects)))
+
+    # signs = np.array(list(filter(lambda o: o.label[-4:] == "sign", not_seen_objs)))
+
+    # # sort objects by axis
+    # if len(signs) > 0:
+    #     def get_attr(o): return getattr(o, 'x')
+    #     get_axis_vals = np.vectorize(get_attr)
+    #     signs = signs[get_axis_vals(signs).argsort()]
+
+    # for obj in not_seen_objs:
+    #     previously_seen.concatenate(map_to_global_Buoy(obj))
+
+    # if signs.size > 1:
+    #     return signs, previously_seen
+    # else:
+    #     return np.array([]), previously_seen

@@ -1,10 +1,11 @@
 from tools.utils import filter_objects, get_midpoint, map_to_global, get_extended_midpoint
 import src.SFR as SFR
-from src.path_execution import pure_pursuit
+#from src.path_execution import pure_pursuit
 from tools.a_star import get_waypoints
 import numpy as np
 from src.modes.tasks_enum import Task
-from src.path_execution import thruster_utils
+#from src.path_execution import thruster_utils
+from tools.path_processing import send_to_controls, process
 import rospy
 from src.buoys import Buoy
 import time
@@ -36,10 +37,17 @@ def transition_to_task():
     else:
         midpoint = get_midpoint(begin_buoys[0], begin_buoys[1])
     global_mid = map_to_global(midpoint[0], midpoint[1])
+    path = process(global_mid)
     rospy.loginfo(f"found first gate at {global_mid}")
+    send_to_controls("path", path)
     rospy.loginfo("moving towards first gate")
-    sL, sR = pure_pursuit.execute([global_mid])
-    thruster_utils.break_thrusters(sL, sR)
+
+    time.sleep(0.1)
+    while not SFR.pp_done:
+        pass
+    send_to_controls("stop")
+    #sL, sR = pure_pursuit.execute([global_mid])
+    #thruster_utils.break_thrusters(sL, sR)
 
 def execute_task(repeat = True):
     if not SFR.system_on:
@@ -102,15 +110,24 @@ def execute_task(repeat = True):
 
         waypoint_global.append([global_x, global_y])
 
+    path = process(waypoint_global)
+    send_to_controls("path", path)
+    
     rospy.loginfo(f"waypoints {waypoint_global}")
     rospy.loginfo("executing path")
-    sL, sR = pure_pursuit.execute(waypoint_global, sec = 3, lookahead = 0.5)
+    
+    time.sleep(0.1)
+    while not SFR.pp_done:
+        pass
+    send_to_controls("stop")
+    #sL, sR = pure_pursuit.execute(waypoint_global, sec = 3, lookahead = 0.5)
     # execute using pure pursuit
 
     # FINISH
     if object_count <= 2:
         rospy.loginfo("finished due to no more buoys in proximity")
-        thruster_utils.break_thrusters(sL, sR)
+        send_to_controls("stop")
+        #thruster_utils.break_thrusters(sL, sR)
         SFR.magellans_route_complete = True
         SFR.task = Task.DETERMINE_TASK
         return
