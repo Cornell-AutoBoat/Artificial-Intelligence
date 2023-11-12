@@ -6,18 +6,18 @@ from src.buoys import Buoy
 import src.control_tasks.northern_passage as northern_passage
 import numpy as np
 import time
-import rospy
+# import rospy
 
 
 def test_panama_canal():
     # Navigate through the two gates of red and green buoys
-    rospy.loginfo("attempting panama canal")
+    print("attempting panama canal")
 
     buoys, _ = utils.filter_objects(["red-buoy", "green-buoy"])
 
     waypoints = []
     if len(buoys) == 4:
-        rospy.loginfo("all buoys seen immediately")
+        print("all buoys seen immediately")
         mid_x1, mid_z1 = utils.get_extended_midpoint(buoys[0], buoys[1], t=1)
         mid_x2, mid_z2 = utils.get_extended_midpoint(buoys[2], buoys[3], t=3)
         waypoints.append(utils.map_to_global(mid_x1, mid_z1))
@@ -27,14 +27,14 @@ def test_panama_canal():
         while not SFR.pp_done:
             pass
     else:
-        rospy.loginfo("can't see all buoys")
+        print("can't see all buoys")
         seen = set()
         gates_passed = 0
         # completion criteria: 2 gates identified and passed through
         while gates_passed < 2:
             gates, seen = panama_canal_pivot(seen)
             if not gates[0, 0] or not gates[0, 1]:
-                rospy.loginfo("FAIL")
+                print("FAIL")
                 return
             else:
                 waypoints = []
@@ -50,19 +50,19 @@ def test_panama_canal():
                 while not SFR.pp_done:
                     pass
         send_to_controls("stop")
-        rospy.loginfo("SUCCESS")
+        print("SUCCESS")
 
 
 def test_northern_passage():
     # Test northern passage waypoint creation. Boat should loop around the blue buoy
     # after entering through the red and green gate buoys then navigate back to its starting position
-    rospy.loginfo("attempting northern passage")
+    print("attempting northern passage")
 
     buoys, _ = northern_passage.filter_buoys(SFR.objects)
 
     northern_passage.pivot()
 
-    rospy.loginfo("found all buoys: (" + str(buoys[0].x) + ", " + str(buoys[0].z) + ")" + "(" + str(
+    print("found all buoys: (" + str(buoys[0].x) + ", " + str(buoys[0].z) + ")" + "(" + str(
         buoys[1].x) + ", " + str(buoys[1].z) + ")" + "(" + str(buoys[2].x) + ", " + str(buoys[2].z) + ")")
 
     waypoints = northern_passage.create_waypoints()
@@ -73,17 +73,17 @@ def test_northern_passage():
         pass
 
     for wp in waypoints:
-        rospy.loginfo("determined waypoint: " + str(wp))
+        print("determined waypoint: " + str(wp))
 
     northern_passage.finish("SUCCESS")
-    rospy.loginfo("done northern passage")
+    print("done northern passage")
 
 
 def test_beaching():
    # Test beaching task. There will be 2 die faces of different colors. Boat should
     # identify the correct color, move towards that sign (but not hit the side of
     # the pool), then back up
-    rospy.loginfo("attempting to complete beaching")
+    print("attempting to complete beaching")
 
     signs, s1 = utils.filter_signs()
     correct_sign, s2 = utils.filter_correct_sign()
@@ -103,9 +103,9 @@ def test_beaching():
     send_to_controls("stop")
 
     for s in signs:
-        rospy.loginfo("found sign: (" + str(s.x) + ", " + str(s.z) + ")")
+        print("found sign: (" + str(s.x) + ", " + str(s.z) + ")")
     for s in correct_sign:
-        rospy.loginfo("found correct sign: (" +
+        print("found correct sign: (" +
                       str(s.x) + ", " + str(s.z) + ")")
 
     if signs.size > 1 and correct_sign.size > 0:
@@ -122,14 +122,14 @@ def test_beaching():
                     sideIndex = i
             i += 1
         sideSign = signs[sideIndex]
-        rospy.loginfo("found sideSign: (" +
+        print("found sideSign: (" +
                       str(sideSign.x) + ", " + str(sideSign.z) + ")")
-        rospy.loginfo("found correctSign: (" +
+        print("found correctSign: (" +
                       str(correct_sign[0].x) + ", " + str(correct_sign[0].z) + ")")
         waypoint = [utils.get_shifted_em(correct_sign[0], sideSign, -1)]
 
-        rospy.loginfo("determined waypoint: " + str(waypoint))
-        rospy.loginfo("eggs found: " + correct_sign[0].label[1])
+        print("determined waypoint: " + str(waypoint))
+        print("eggs found: " + correct_sign[0].label[1])
 
         path = process(waypoint)
         send_to_controls("path", path)
@@ -140,9 +140,9 @@ def test_beaching():
         time.sleep(2)
         send_to_controls("stop")
 
-        rospy.loginfo("done beaching")
+        print("done beaching")
     else:
-        rospy.loginfo("Signs not seen")
+        print("Signs not seen")
 
 
 def test_a_star_magellans_route(run=True):
@@ -150,7 +150,7 @@ def test_a_star_magellans_route(run=True):
     # of the pool (but don't hit the side of the pool). There will be a buoy or
     # two in the way of the boat to the sign.
     # NOTE: might have to make object coords negative
-    rospy.loginfo("going through mini magellans route")
+    print("going through mini magellans route")
 
     objects_map = [[0]*100 for _ in range(100)]
     objects, _ = utils.filter_objects(
@@ -159,21 +159,21 @@ def test_a_star_magellans_route(run=True):
     goal = utils.map_to_global(goal_object[0].x, goal_object[0].z)
 
     for object in objects:
-        rospy.loginfo("building map from object list")
+        print("building map from object list")
         object_x, object_z = utils.map_to_global(object.x, object.z)
         object_row_index = int(object_x - SFR.tx) + 50
         object_col_index = int(object_z - SFR.tz) + 50
         if object_row_index < 100 and object_row_index >= 0 and object_col_index < 100 and object_col_index >= 0:
             objects_map[object_row_index][object_col_index] = 1
         else:
-            rospy.loginfo("object out of range")
+            print("object out of range")
 
-    rospy.loginfo("getting waypoints")
+    print("getting waypoints")
     waypoint_indices = get_waypoints(
         objects_map, (50, 50), (goal[0] - SFR.tx + 50, goal[1] - SFR.tz + 50))
     waypoint_global = []
 
-    rospy.loginfo("converting waypoints to global coordinates")
+    print("converting waypoints to global coordinates")
     for index_x, index_z in waypoint_indices:
         global_x = SFR.tx + index_x - 50
 
@@ -181,24 +181,24 @@ def test_a_star_magellans_route(run=True):
 
         waypoint_global.append([global_x, global_z])
 
-    rospy.loginfo("going towards waypoints")
-    rospy.loginfo(waypoint_global)
+    print("going towards waypoints")
+    print(waypoint_global)
     if run:
         path = process([waypoint_global])
         send_to_controls("path", path)
         while not SFR.pp_done:
             pass
 
-def explore_reef():
+def test_explore_reef():
     pass
 
 
 def execute():
-    rospy.loginfo("starting task visualization")
+    print("starting task visualization")
     # test_panama_canal()
     # test_northern_passage()
     # test_beaching()
     # test_a_star_magellans_route()
     # test_explore_reef()
     SFR.execution_done = True
-    rospy.loginfo("finished task visualization")
+    print("finished task visualization")

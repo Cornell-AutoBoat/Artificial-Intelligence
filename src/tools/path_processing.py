@@ -142,7 +142,7 @@ def process(waypoints):
     path = convert_to_msg_type(path)
 
     # UNCOMMENT FOR VISUALIZATIONS!! Change field size according to buoy placement
-    # path_visualizer(waypoints, path, (1, 1), (-10, -5, 10, 20))
+    path_visualizer(waypoints, path, (1, 1), (-10, -5, 10, 20))
 
     return path
 

@@ -8,7 +8,7 @@ from src.modes.tasks_enum import Task
 
 # Boat competition state variables.
 mode = Mode.REMOTE_CONTROL
-task = Task.BASIC_TASKS
+task = Task.TASKS_VISUALIZATION
 execution_done = False
 pp_done = False
 
@@ -20,7 +20,7 @@ alive = True
 
 # Indicates if the RC knob on the remote controller has been turned on. If False,
 # our code should stall. If True, autonomous mode is activated and our code will run
-autonomous = False
+autonomous = True
 
 # Values to be sent to the left and right thrusters
 sL = 1500

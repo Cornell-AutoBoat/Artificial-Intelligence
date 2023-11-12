@@ -6,15 +6,15 @@ course has been completed.
 
 from src import autonomous_control, SFR
 from src.modes.movement_modes_enum import Mode
-import rospy
+# import rospy
 import numpy as np
 import time
 
-from test.msg import ZEDdata, State, SensorReadings, MotionPlans, Done
+# from test.msg import ZEDdata, State, SensorReadings, MotionPlans, Done
 
 
 def main_control_loop():
-    rospy.loginfo("entering main control loop")
+    # rospy.loginfo("entering main control loop")
     # stall while the system is off or remote control is on
     print(SFR.alive)
     print(SFR.autonomous)
@@ -48,17 +48,17 @@ def callback_done(msg):
 
 
 if __name__ == "__main__":
-    rospy.init_node('AINode', anonymous=True)
-    rospy.Subscriber('zed_data', ZEDdata, callback_zed)
-    rospy.Subscriber('alive_auto', State, callback_state)
-    rospy.Subscriber('sensors', SensorReadings, callback_sensors)
-    rospy.Subscriber('done', Done, callback_done)
-    pub = rospy.Publisher('motion_plans', MotionPlans, queue_size=10)
-    SFR.mcPub = pub
-    time.sleep(3)
-    while not SFR.execution_done and not rospy.is_shutdown():
+    # rospy.init_node('AINode', anonymous=True)
+    # rospy.Subscriber('zed_data', ZEDdata, callback_zed)
+    # rospy.Subscriber('alive_auto', State, callback_state)
+    # rospy.Subscriber('sensors', SensorReadings, callback_sensors)
+    # rospy.Subscriber('done', Done, callback_done)
+    # pub = rospy.Publisher('motion_plans', MotionPlans, queue_size=10)
+    # SFR.mcPub = pub
+    # time.sleep(3)
+    while not SFR.execution_done: #and not rospy.is_shutdown():
         main_control_loop()
 
-    rospy.loginfo(
-        "\\\\\\\\\\\\\\\\\\\\\\\\\\finished main control loop\\\\\\\\\\\\\\\\\\\\\\\\\\")
+    # rospy.loginfo(
+    #     "\\\\\\\\\\\\\\\\\\\\\\\\\\finished main control loop\\\\\\\\\\\\\\\\\\\\\\\\\\")
 
