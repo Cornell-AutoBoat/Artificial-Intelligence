@@ -7,7 +7,7 @@ import src.SFR as SFR
 import src.tools.utils as utils
 import numpy as np
 from src.modes.movement_modes_enum import Mode
-import rospy
+from src.tools.path_processing import Path
 import time
 
 
@@ -55,7 +55,9 @@ def pivot():
     sL = 1500
     sR = 1500
     # Boat takes 2 pi seconds to pivot in a full circle at 1 rad/sec
-    if signs.size < 2 and correct_sign.size != 1:
+    
+    #old pivot code 
+    '''if signs.size < 2 and correct_sign.size != 1:
         thruster_utils.sendValue(1550, 1450)
         sL, sR = 1550, 1450
         while signs.size < 2 and correct_sign.size != 1:
@@ -63,7 +65,22 @@ def pivot():
                 break
             signs, s2 = utils.filter_signs()
             correct_sign, s1 = utils.filter_correct_sign()
-        thruster_utils.break_thrusters(sL, sR)
+        thruster_utils.break_thrusters(sL, sR)  '''
+    
+    # If there are not enough signs seen and the correct sign is not seen --> pivot 
+    # Once the correct number of signs is seen and the correct sign is found --> stop pivoting 
+
+    if signs.size < 2 and correct_sign.size != 1:
+        Path.send_to_controls("pivot_r")
+        while signs.size < 2 and correct_sign.size != 1:
+            if time.time() - start > 20:
+                break
+            signs, s2 = utils.filter_signs()
+            correct_sign, s1 = utils.filter_correct_sign()
+        Path.send_to_controls("stop")
+
+
+
 
     # not enough signs seen
     if signs.size < 2 or correct_sign.size != 1:
@@ -103,43 +120,66 @@ def execute():
         sideSign = signs[sideIndex]
 
         rospy.loginfo("found sideSign: (" +
-                      str(sideSign.x) + ", " + str(sideSign.z) + ")")
+                    str(sideSign.x) + ", " + str(sideSign.z) + ")")
         waypoint = [utils.get_shifted_em(targetSign[0], sideSign, -1)]
-        sL, sR = pure_pursuit.execute(waypoint)
+        rospy.loginfo("determined waypoint: " + str(waypoint))
+        
 
-         ####### CHANGE
+        ####### CHANGE (should perform same task as waypoint above, no longer needed)
+        """"       
         rospy.loginfo("found sideSign: (" +
                      str(sideSign.x) + ", " + str(sideSign.z) + ")")
         yDifference = np.absolute(sideSign.y - targetY)
         xDifference = np.absolute(sideSign.x - targetX)
         slopeTarget = -1* yDifference / xDifference
         univertedSlope = xDifference / yDifference
-        currLocX = tx
-        currLocY = ty
-        currLocZ = tz
+        currLocX = SFR.tx
+        currLocY = SFR.ty
+        currLocZ = SFR.tz
         waypointX = ((univertedSlope * currLocX) +  currLocY + ((slopeTarget)*targetSign[0].x) - targetSign[0].y)/(slopeTarget - invertedSlope)
         waypointY = (slopeTarget(tx-targetSign[0].x)+ targetSign[0].y)
         waypoint2 = [utils.get_shifted_em(targetSign[0], sideSign, -1)]
-        sL, sR = pure_pursuit.execute(waypoint2)
+        #sL, sR = pure_pursuit.execute(waypoint2) 
+        """
+
         
-        rospy.loginfo("determined waypoint: " + str(waypoint2))
+        # Executes path to move in front of dock
+        path = Path.process(waypoint)
+        Path.send_to_controls("path", path)
+        time.sleep(0.1)
+        while not SFR.pp_done: 
+            pass 
+        Path.send_to_controls("stop")
+
+        
 
         # ADD orientation code
 
-        # move forward
-        thruster_utils.break_thrusters(sL, sR)
+        # Move forward to pull into dock
 
-        start = time.time()
-        sL, sR = thruster_utils.move_straight("B")
-        while time.time() - start < 1:
-            pass
+        Path.send_to_controls("fwd")
+        time.sleep(0.1)
+        while not SFR.pp_done: 
+            pass 
 
-        thruster_utils.break_thrusters(sL, sR)
+        Path.send_to_controls("stop")
 
-        # move backward
+        # Time the boat stays parked in the dock
+        time.sleep(5) 
+
+        # Move backward to back out of dock
+        Path.send_to_controls("bwd")
+        time.sleep(0.1)
+        while not SFR.pp_done: 
+            pass 
+
+        Path.send_to_controls("stop")
+
+
         rospy.loginfo("done beaching")
-        finish("SUCCESS")
+        finish("SUCCESS") 
 
+    
 
 def finish(result):
     rospy.loginfo(result)
