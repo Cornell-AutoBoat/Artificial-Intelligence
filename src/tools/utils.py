@@ -138,7 +138,7 @@ def get_extended_buoy(b, t=3):
     return [x, y]
 
 
-def filter_objects(labels, previously_seen=[],  axis='y'):
+def filter_objects(labels, previously_seen=set(),  axis='y'):
     """
     Filter objects array to contain only objects with a label in labels, sorts 
     the objects by specified axis, and keeps track of objects already seen.
@@ -147,7 +147,7 @@ def filter_objects(labels, previously_seen=[],  axis='y'):
         previously_seen: set of objects in the global frame.
         axis: one of 'x', 'y', or 'z'.
     Returns:
-        objs: sorted numpy array of objects in the local frame.
+        objs_correct: sorted numpy array of objects in the local frame.
         seen: the updated set of objects seen in the global frame.
     """
 
@@ -156,29 +156,24 @@ def filter_objects(labels, previously_seen=[],  axis='y'):
    #maybe delete this part: and o.label in labels
    #new correct objects:
    #want to filter new_objs to get only objects with labels in label
-    obj_corr = np.array(
+    obj_correct = np.array(
        list(filter(lambda o: o.label in labels), objs))
+    
+    #adding all objs to previously_seen
+    for obj in objs:
+       previously_seen.add(map_to_global_Buoy(obj))
   
    # if we see no objects that fit criteria return empty set
-    if not np.all(obj_corr):
+    if not np.all(obj_correct):
        return np.array([]), previously_seen
 
    # sort objects by axis
-    if len(obj_corr) > 0:
+    if len(obj_correct) > 0:
        def get_attr(o): return getattr(o, axis)
        get_axis_vals = np.vectorize(get_attr)
        objs = objs[get_axis_vals(objs).argsort()]
 
-    global_obj = []
-    for obj in objs: 
-        global_corr = map_to_global(obj.x,obj.y)
-        o1 = Buoy(global_corr[0], global_corr[0])
-        global_obj.append(o1)
-
-    for obj in global_obj:
-       previously_seen.add(obj)
-
-    return obj_corr, previously_seen
+    return obj_correct, previously_seen
 
 
 
