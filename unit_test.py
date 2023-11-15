@@ -1,13 +1,8 @@
 import unittest
 from src.buoys import Buoy
-<<<<<<< HEAD:unit_test.py
 from src import SFR
 import numpy as np
-=======
->>>>>>> a2b1ed7 (changes to test.py):test.py
 from src.tools import utils
-from src import SFR
-import numpy as np
 
 
 class TestSeen(unittest.TestCase):
@@ -561,6 +556,7 @@ def set_equality(set1, set2):
         for i in range(len(l1)):
             result = result and (l1[i].x == l2[i].x and l1[i].y == l2[i].y and l1[i].label == l2[i].label)
     return result
+
 
 if __name__ == '__main__':
     unittest.main()
