@@ -1,7 +1,10 @@
 import unittest
 from src.buoys import Buoy
+<<<<<<< HEAD:unit_test.py
 from src import SFR
 import numpy as np
+=======
+>>>>>>> a2b1ed7 (changes to test.py):test.py
 from src.tools import utils
 from src import SFR
 import numpy as np
@@ -413,124 +416,151 @@ class TestFilterObjects(unittest.TestCase):
 
 
 class TestFilterCorrectSign(unittest.TestCase):
+    """
+    Function returns:
+        objs: sorted numpy array of correct sign
+        seen: seen objects
+    """
     def test_empty_set(self):
+        SFR.heading = np.pi / 2
+        SFR.tx, SFR.ty = 0.0, 0.0
         SFR.objects = []
+        SFR.sign_color = "r"
         objs, seen = utils.filter_correct_sign()
-        self.assertTrue(np.array_equal(objs, np.array([])),
-                        "testing first return value")
-        self.assertEqual(seen, [], "testing second return value")
-
-    def test_one_sign(self):
-        o1 = Buoy("red-buoy", 0.0, 0.0, 0.0)
+        self.assertTrue(np.array_equal(objs, np.array([])), "testing first return value")
+        self.assertTrue(np.array_equal(seen, np.array([])), "testing second return value")
+    def test_one_sign_true(self):
+        SFR.heading = np.pi / 2
+        SFR.tx, SFR.ty = 0.0, 0.0
+        o1 = Buoy("red-sign", 0.0, 0.0, 0.0)
         SFR.objects = [o1]
         SFR.sign_color = "r"
         objs, seen = utils.filter_correct_sign()
-        self.assertTrue(np.array_equal(objs, np.array([])),
-                        "testing first return value")
-        self.assertEqual(seen, [], "testing second return value")
-
-    def test_two_signs(self):
-        o1 = Buoy("red-buoy", 4.0, 0.0, 0.0)
-        o2 = Buoy("green-buoy", 0.0, 0.0, 0.0)
-        SFR.objects = [o1, o2]
+        self.assertTrue(np.array_equal(objs, np.array(SFR.objects)), "testing first return value")
+        self.assertTrue(np.array_equal(seen, np.array(SFR.objects)), "testing second return value")
+    def test_one_sign_false(self):
+        SFR.heading = np.pi / 2
+        SFR.tx, SFR.ty = 0.0, 0.0
+        o1 = Buoy("red-sign", 0.0, 0.0, 0.0)
+        SFR.objects = [o1]
         SFR.sign_color = "g"
         objs, seen = utils.filter_correct_sign()
-        self.assertTrue(np.array_equal(objs, np.array([])),
-                        "testing first return value")
-        self.assertEqual(seen, [], "testing second return value")
+        self.assertTrue(np.array_equal(objs, np.array([])), "testing first return value")
+        self.assertTrue(np.array_equal(seen, np.array([])), "testing second return value")
+    def test_two_signs_seen(self):
+        SFR.heading = np.pi / 2
+        SFR.tx, SFR.ty = 0.0, 0.0
+        o1 = Buoy("red-sign", 4.0, 0.0, 0.0)
+        o2 = Buoy("green-sign", 0.0, 0.0, 0.0)
+        SFR.objects = [o1,o2]
+        SFR.sign_color = "g"
+        objs, seen = utils.filter_correct_sign([o1])
+        self.assertTrue(np.array_equal(objs, [o2]), "testing first return value")
+        self.assertTrue(np.array_equal(seen, np.array(SFR.objects)), "testing second return value")
 
     def test_multiple_signs(self):
-        o1 = Buoy("red-buoy", 4.0, 0.0, 0.0)
-        o2 = Buoy("green-buoy", 0.0, 0.0, 0.0)
-        o3 = Buoy("green-buoy", -2.0, 0.0, 0.0)
-        o4 = Buoy("green-buoy", -3.0, 0.0, 0.0)
-        SFR.objects = [o1, o2, o3, o4]
+        SFR.heading = np.pi / 2
+        SFR.tx, SFR.ty = 0.0, 0.0
+        o1 = Buoy("green-sign", 0.0, 0.0, 0.0)
+        o2 = Buoy("green-sign", -2.0, 0.0, 0.0)
+        o3 = Buoy("red-sign", 4.0, 0.0, 0.0)
+        o4 = Buoy("green-sign", -3.0, 0.0, 0.0)
+        SFR.objects = [o1,o2,o3,o4]
         SFR.sign_color = "r"
         objs, seen = utils.filter_correct_sign()
-        self.assertTrue(np.array_equal(objs, np.array([])),
-                        "testing first return value")
-        self.assertEqual(seen, [], "testing second return value")
+        self.assertTrue(np.array_equal(objs, np.array([o3])), "testing first return value")
+        self.assertTrue(np.array_equal(seen, np.array([o3])), "testing second return value")
 
-    def test_multiple_signs_seen(self):
-        o1 = Buoy("red-buoy", 4.0, 0.0, 0.0)
-        o2 = Buoy("green-buoy", 0.0, 0.0, 0.0)
-        o3 = Buoy("green-buoy", -2.0, 0.0, 0.0)
-        o4 = Buoy("green-buoy", -3.0, 0.0, 0.0)
-        SFR.objects = [o1, o2, o3, o4]
+    def test_multiple_signs_false(self):
+        SFR.heading = np.pi / 2
+        SFR.tx, SFR.ty = 0.0, 0.0
+        o1 = Buoy("green-sign", 0.0, 0.0, 0.0)
+        o2 = Buoy("green-sign", -2.0, 0.0, 0.0)
+        o3 = Buoy("red-sign", 4.0, 0.0, 0.0)
+        o4 = Buoy("green-sign", -3.0, 0.0, 0.0)
+        SFR.objects = [o1,o2,o3,o4]
         SFR.sign_color = "g"
         objs, seen = utils.filter_correct_sign()
-        self.assertTrue(np.array_equal(objs, np.array([])),
-                        "testing first return value")
-        self.assertEqual(seen, [], "testing second return value")
-
+        self.assertTrue(np.array_equal(objs, np.array([])), "testing first return value")
+        self.assertTrue(np.array_equal(seen, np.array([])), "testing second return value")
 
 class TestFilterSigns(unittest.TestCase):
     def test_empty_set(self):
+        SFR.heading = np.pi / 2
+        SFR.tx, SFR.ty = 0.0, 0.0
         SFR.objects = np.array([])
-        objs, seen = utils.filter_signs()
-        self.assertTrue(np.array_equal(objs, np.array([])),
-                        "testing first return value")
-        self.assertEqual(seen, [], "testing second return value")
+        objs, seen = utils.filter_signs(set())
+        self.assertTrue(np.array_equal(objs, np.array([])), "no buoy in list")
+        self.assertEqual(seen, set())
 
     def test_one_sign(self):
+        SFR.heading = np.pi / 2
+        SFR.tx, SFR.ty = 0.0, 0.0
         o1 = Buoy("red-sign", 0.0, 0.0, 0.0)
+        o1g = utils.map_to_global_Buoy(o1)
         SFR.objects = [o1]
-        objs, seen = utils.filter_signs()
-        self.assertTrue(np.array_equal(objs, np.array([])),
-                        "testing first return value")
-        self.assertEqual(seen, [], "testing second return value")
+        print("calling")
+        objs, seen = utils.filter_signs(set())
+        self.assertTrue(np.array_equal(objs, np.array([o1])), "need more than 1 buoy to filter")
+        print(seen)
+        #print({o1}) 
 
+        self.assertTrue(set_equality(seen,{o1}), "wrongly identified buoy")
+        
     def test_two_signs(self):
+        SFR.heading = np.pi / 2
+        SFR.tx, SFR.ty = 0.0, 0.0
+        
         o1 = Buoy("red-sign", 4.0, 0.0, 0.0)
         o2 = Buoy("green-sign", 0.0, 0.0, 0.0)
-        SFR.objects = [o2, o1]
-        objs, seen = utils.filter_signs()
-        self.assertTrue(np.array_equal(objs, np.array(
-            SFR.objects)), "testing first return value")
-        self.assertTrue(np.array_equal(seen, np.array(
-            SFR.objects)), "testing second return value")
+        SFR.objects = [o2,o1]
+        objs, s = utils.filter_signs(set())
+        print(objs)
+        print(np.array(SFR.objects))
+        self.assertTrue(np.array_equal(objs, np.array(SFR.objects)), "wrongly filtered buoy")
+        self.assertTrue(set_equality(s,{o2, o1}), "wrongly identified buoy")
 
     def test_two_signs_seen(self):
+        SFR.heading = np.pi / 2
+        SFR.tx, SFR.ty = 0.0, 0.0
         o1 = Buoy("red-sign", 4.0, 0.0, 0.0)
         o2 = Buoy("green-sign", 8.0, 0.0, 0.0)
         o3 = Buoy("green-sign", -2.0, 0.0, 0.0)
-        SFR.objects = [o3, o1, o2]
-        objs, seen = utils.filter_signs()
-        self.assertTrue(np.array_equal(objs, np.array(
-            SFR.objects)), "testing first return value")
-        self.assertTrue(np.array_equal(seen, np.array(
-            SFR.objects)), "testing second return value")
+        o4 = Buoy("red-sign", 0.0, 0.0, 0.0)
+        SFR.objects = [o3,o1,o2]
+        objs, s = utils.filter_signs({o4})
+        self.assertTrue(np.array_equal(objs, np.array(SFR.objects)), "wrongly filtered buoys")
+        o1g = utils.map_to_global_Buoy(o1)
+        o2g = utils.map_to_global_Buoy(o2)
+        o3g = utils.map_to_global_Buoy(o3)
+        o4g = utils.map_to_global_Buoy(o4)
+        # print(seen)
+        # print({o4g, o3g, o1g, o2g})
+       #{o4, o3, o1, o2}
+        self.assertTrue(set_equality(s,{o4g, o3g, o1g, o2g}), "seen buoys are not the same")        
 
     def test_multiple_signs(self):
+        SFR.heading = np.pi / 2
+        SFR.tx, SFR.ty = 0.0, 0.0
         o1 = Buoy("red-sign", 4.0, 0.0, 0.0)
         o2 = Buoy("green-sign", 0.0, 0.0, 0.0)
         o3 = Buoy("green-sign", -2.0, 0.0, 0.0)
         o4 = Buoy("green-sign", -3.0, 0.0, 0.0)
-        SFR.objects = [o4, o3, o2, o1]
-        objs, seen = utils.filter_signs()
-        self.assertTrue(np.array_equal(objs, np.array(
-            SFR.objects)), "testing first return value")
-        self.assertTrue(np.array_equal(seen, np.array(
-            SFR.objects)), "testing second return value")
+        SFR.objects = [o4,o3,o2,o1]
+        objs, s = utils.filter_signs(set())
+        self.assertTrue(np.array_equal(objs, np.array(SFR.objects)), "wrongly filtered buoys")
+        self.assertTrue(set_equality(s,{o4, o3, o2, o1}), "seen buoys are not the same")
 
-    def test_duplicates(self):
-        o1 = Buoy("red-sign", 4.0, 0.0, 0.0)
-        o2 = Buoy("green-sign", -2.0, 0.0, 0.0)
-        o3 = Buoy("green-sign", -2.0, 0.0, 0.0)
-        o4 = Buoy("green-sign", -3.0, 0.0, 0.0)
-        SFR.objects = [o4, o2, o3, o1]
-        objs, seen = utils.filter_signs()
-        self.assertTrue(np.array_equal(objs, np.array(
-            SFR.objects)), "testing first return value")
-        self.assertTrue(np.array_equal(seen, np.array(
-            SFR.objects)), "testing second return value")
-        SFR.objects = [o4, o3, o2, o1]
-        objs, seen = utils.filter_signs()
-        self.assertTrue(np.array_equal(objs, np.array(
-            SFR.objects)), "testing first return value")
-        self.assertTrue(np.array_equal(seen, np.array(
-            SFR.objects)), "testing second return value")
-
+def set_equality(set1, set2):
+    result = True
+    l1 = sorted(list(set1), key=lambda b: b.x)
+    l2 = sorted(list(set2), key=lambda b: b.x)
+    # sort 
+    if len(l1) != len(l2): result = False
+    else:
+        for i in range(len(l1)):
+            result = result and (l1[i].x == l2[i].x and l1[i].y == l2[i].y and l1[i].label == l2[i].label)
+    return result
 
 if __name__ == '__main__':
     unittest.main()
