@@ -214,7 +214,7 @@ def pivot_to_gate(s):
     return gate, s
 
 
-def filter_correct_sign(previously_seen=[]):
+def filter_correct_sign(previously_seen=set()):
     """
     Filter objects array to contain only the sign with the correct color.
     Args:
@@ -223,12 +223,17 @@ def filter_correct_sign(previously_seen=[]):
         objs: sorted numpy array of correct sign
         seen: seen objects
     """
-    signs = np.array(
-        list(filter(lambda o: not (seen(o, previously_seen)) and o.label[0] == SFR.sign_color and o.label[-4:] == "sign", SFR.objects)))
-    s = np.concatenate((previously_seen, signs))
-
+    not_seen_objs = np.array(
+        list(filter(lambda o: not (seen(o, previously_seen)), SFR.objects)))
+    
+    signs = np.array(list(filter(lambda o: o.label[0] == SFR.sign_color and o.label[-4:] == "sign", not_seen_objs)))
+    
+    for obj in not_seen_objs:
+        objGlobal = map_to_global_Buoy(obj)
+        previously_seen.add(objGlobal)
+    
     if signs.size == 1:
-        return signs, s
+        return signs, previously_seen
     else:
         return np.array([]), previously_seen
 
