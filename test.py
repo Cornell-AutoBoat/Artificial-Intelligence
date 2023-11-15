@@ -482,8 +482,6 @@ class TestFilterSigns(unittest.TestCase):
         o2 = Buoy("green-sign", 0.0, 0.0, 0.0)
         SFR.objects = [o2,o1]
         objs, s = utils.filter_signs(set())
-        print(objs)
-        print(np.array(SFR.objects))
         self.assertTrue(np.array_equal(objs, np.array(SFR.objects)), "wrongly filtered buoy")
         self.assertTrue(set_equality(s,{o2, o1}), "wrongly identified buoy")
 
@@ -501,9 +499,6 @@ class TestFilterSigns(unittest.TestCase):
         o2g = utils.map_to_global_Buoy(o2)
         o3g = utils.map_to_global_Buoy(o3)
         o4g = utils.map_to_global_Buoy(o4)
-        # print(seen)
-        # print({o4g, o3g, o1g, o2g})
-       #{o4, o3, o1, o2}
         self.assertTrue(set_equality(s,{o4g, o3g, o1g, o2g}), "seen buoys are not the same")        
 
     def test_multiple_signs(self):
@@ -515,8 +510,12 @@ class TestFilterSigns(unittest.TestCase):
         o4 = Buoy("green-sign", -3.0, 0.0, 0.0)
         SFR.objects = [o4,o3,o2,o1]
         objs, s = utils.filter_signs(set())
+        o1g = utils.map_to_global_Buoy(o1)
+        o2g = utils.map_to_global_Buoy(o2)
+        o3g = utils.map_to_global_Buoy(o3)
+        o4g = utils.map_to_global_Buoy(o4)
         self.assertTrue(np.array_equal(objs, np.array(SFR.objects)), "wrongly filtered buoys")
-        self.assertTrue(set_equality(s,{o4, o3, o2, o1}), "seen buoys are not the same")
+        self.assertTrue(set_equality(s,{o4g, o3g, o2g, o1g}), "seen buoys are not the same")
 
 def set_equality(set1, set2):
     result = True
