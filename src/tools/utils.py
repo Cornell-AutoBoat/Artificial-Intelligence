@@ -223,7 +223,6 @@ def filter_correct_sign(previously_seen=set()):
         objs: sorted numpy array of correct sign
         seen: seen objects
     """
-<<<<<<< HEAD
     not_seen_objs = np.array(
         list(filter(lambda o: not (seen(o, previously_seen)), SFR.objects)))
     
@@ -233,12 +232,6 @@ def filter_correct_sign(previously_seen=set()):
         objGlobal = map_to_global_Buoy(obj)
         previously_seen.add(objGlobal)
     
-=======
-    signs = np.array(
-        list(filter(lambda o: not (seen(o, previously_seen)) and o.label[0] == SFR.sign_color and o.label[-4:] == "sign", SFR.objects)))
-    s = np.concatenate((previously_seen, signs))
-
->>>>>>> 5d0fdcc0eded8504906bb9e6bab0381adb43b6af
     if signs.size == 1:
         return signs, previously_seen
     else:

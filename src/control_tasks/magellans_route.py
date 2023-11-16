@@ -1,23 +1,12 @@
 from src.tools.utils import filter_objects, get_midpoint, map_to_global, get_extended_midpoint
 import src.SFR as SFR
-<<<<<<< HEAD
-<<<<<<< HEAD
 from src.tools.a_star import get_waypoints
 import numpy as np
 from src.modes.tasks_enum import Task
-=======
-=======
->>>>>>> 5d0fdcc0eded8504906bb9e6bab0381adb43b6af
 #from src.path_execution import pure_pursuit
 from tools.a_star import get_waypoints
-import numpy as np
-from src.modes.tasks_enum import Task
 #from src.path_execution import thruster_utils
 from tools.path_processing import send_to_controls, process
-<<<<<<< HEAD
->>>>>>> a2b1ed7 (changes to test.py)
-=======
->>>>>>> 5d0fdcc0eded8504906bb9e6bab0381adb43b6af
 import rospy
 from src.buoys import Buoy
 import time
