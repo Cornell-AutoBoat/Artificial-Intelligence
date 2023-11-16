@@ -138,43 +138,36 @@ def get_extended_buoy(b, t=3):
     return [x, y]
 
 
-def filter_objects(labels, previously_seen=set(),  axis='y'):
+def filter_objects(labels, previously_seen=[],  axis='y'):
     """
     Filter objects array to contain only objects with a label in labels, sorts 
     the objects by specified axis, and keeps track of objects already seen.
     Args:
         labels: list of strings.
-        previously_seen: set of objects in the global frame.
+        previously_seen: set.
         axis: one of 'x', 'y', or 'z'.
     Returns:
-        objs_correct: sorted numpy array of objects in the local frame.
-        seen: the updated set of objects seen in the global frame.
+        objs: sorted numpy array of objects.
+        seen: the updated set of objects seen.
     """
 
+    # objs only has objects with a label in labels
     objs = np.array(
-       list(filter(lambda o: not (seen(o, previously_seen)), SFR.objects)))
-   #maybe delete this part: and o.label in labels
-   #new correct objects:
-   #want to filter new_objs to get only objects with labels in label
-    obj_correct = np.array(
-       list(filter(lambda o: o.label in labels), objs))
-    
-    #adding all objs to previously_seen
-    for obj in objs:
-       previously_seen.add(map_to_global_Buoy(obj))
-  
-   # if we see no objects that fit criteria return empty set
-    if not np.all(obj_correct):
-       return np.array([]), previously_seen
+        list(filter(lambda o: not (seen(o, previously_seen)) and o.label in labels, SFR.objects)))
 
-   # sort objects by axis
-    if len(obj_correct) > 0:
-       def get_attr(o): return getattr(o, axis)
-       get_axis_vals = np.vectorize(get_attr)
-       objs = objs[get_axis_vals(objs).argsort()]
+    # if we see no objects that fit criteria return empty set
+    if not np.all(objs):
+        return np.array([]), previously_seen
 
-    return obj_correct, previously_seen
+    # sort objects by axis
+    if len(objs) > 0:
+        def get_attr(o): return getattr(o, axis)
+        get_axis_vals = np.vectorize(get_attr)
+        objs = objs[get_axis_vals(objs).argsort()]
 
+    s = np.concatenate((previously_seen, objs))
+
+    return objs, s
 
 
 def pivot_to_gate(s):
