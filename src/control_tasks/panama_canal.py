@@ -30,7 +30,7 @@ def pivot(seen):
         if time.time() - start > 4:
             break
         buoys, seen = utils.filter_objects(
-            ["green-column-buoy", "red-column-buoy"], seen)
+            ["green-column-buoy", "red-column-buoy"], seen, sort_by='dist')
         for b in buoys:
             if b.y < 4.0:   # buoy is less than 4 meters away
                 if b.label == "red-column-buoy":
@@ -51,7 +51,7 @@ def pivot(seen):
             if time.time() - start > 8:
                 break
             buoys, seen = utils.filter_objects(
-                ["green-column-buoy", "red-column-buoy"], seen)
+                ["green-column-buoy", "red-column-buoy"], seen, sort_by='dist')
             for b in buoys:
                 if b.y < 4.0:   # buoy is less than 4 meters away
                     if b.label == "red-column-buoy":
@@ -72,7 +72,7 @@ def pivot(seen):
             if time.time() - start > 4:
                 break
             buoys, seen = utils.filter_objects(
-                ["green-column-buoy", "red-column-buoy"], seen)
+                ["green-column-buoy", "red-column-buoy"], seen, sort_by='dist')
             for b in buoys:
                 if b.y < 4.0:   # buoy is less than 4 meters away
                     if b.label == "red-column-buoy":
@@ -97,12 +97,12 @@ def execute():
 
     rospy.loginfo("attempting panama canal")
 
-    buoys, _ = utils.filter_objects(["red-column-buoy", "green-column-buoy"])
+    buoys, _ = utils.filter_objects(["red-column-buoy", "green-column-buoy"], sort_by='dist')
     waypoints = []
     if len(buoys) == 4:
         rospy.loginfo("all buoys seen immediately")
-        mid_x1, mid_y1 = utils.get_extended_midpoint(buoys[0], buoys[1], t=1)
-        mid_x2, mid_y2 = utils.get_extended_midpoint(buoys[2], buoys[3], t=3)
+        mid_x1, mid_y1 = utils.get_midpoint(buoys[0], buoys[1])
+        mid_x2, mid_y2 = utils.get_midpoint(buoys[2], buoys[3])
         waypoints.append(utils.map_to_global(mid_x1, mid_y1))
         waypoints.append(utils.map_to_global(mid_x2, mid_y2))
 

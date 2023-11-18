@@ -130,7 +130,7 @@ def process(waypoints):
     """
     path = waypoints.copy()
     # Add the position of the boat to the start of the list of waypoints. Necessary for point injection and smoothing
-    path.insert(0, [SFR.tx, SFR.tz])
+    path.insert(0, [SFR.tx, SFR.ty])
 
     # Inject waypoints 1 meter apart
     path = inject_waypoints(path, 1)
