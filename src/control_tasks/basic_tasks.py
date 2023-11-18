@@ -6,7 +6,7 @@ from src.buoys import Buoy
 import src.control_tasks.northern_passage as northern_passage
 import numpy as np
 import time
-import rospy
+# import rospy
 
 
 def test_auto_mode():

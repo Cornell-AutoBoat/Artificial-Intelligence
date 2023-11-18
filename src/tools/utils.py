@@ -137,14 +137,15 @@ def get_extended_buoy(b, t=3):
     return [x, y]
 
 
-def filter_objects(labels, previously_seen=[],  axis='y'):
+def filter_objects(labels, previously_seen=[],  sort_by='y'):
     """
     Filter objects array to contain only objects with a label in labels, sorts 
-    the objects by specified axis, and keeps track of objects already seen.
+    the objects by specified attribute, and keeps track of objects already seen.
     Args:
         labels: list of strings.
         previously_seen: set.
-        axis: one of 'x', 'y', or 'z'.
+        sort_by: one of 'dist', 'x', 'y', or 'label'. 
+        'dist' corresponds to the euclidean distance from the boat. The other options are object attributes.
     Returns:
         objs: sorted numpy array of objects.
         seen: the updated set of objects seen.
@@ -158,11 +159,16 @@ def filter_objects(labels, previously_seen=[],  axis='y'):
     if not np.all(objs):
         return np.array([]), previously_seen
 
-    # sort objects by axis
+    # sort objects accordingly
     if len(objs) > 0:
-        def get_attr(o): return getattr(o, axis)
-        get_axis_vals = np.vectorize(get_attr)
-        objs = objs[get_axis_vals(objs).argsort()]
+        if sort_by == "dist":
+            def get_attr(o): return np.sqrt(o.x**2 + o.y**2)
+            get_axis_vals = np.vectorize(get_attr)
+            objs = objs[get_axis_vals(objs).argsort()]
+        else:
+            def get_attr(o): return getattr(o, sort_by)
+            get_axis_vals = np.vectorize(get_attr)
+            objs = objs[get_axis_vals(objs).argsort()]
 
     s = np.concatenate((previously_seen, objs))
 

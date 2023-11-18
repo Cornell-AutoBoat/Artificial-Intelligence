@@ -12,6 +12,7 @@ import src.control_tasks.skeeball as skeeball
 import src.control_tasks.water_blast as water_blast
 import src.control_tasks.explore_reef as explore_reef
 import src.control_tasks.basic_tasks as basic_tasks
+import src.control_tasks.tasks_visualization as tasks_visualization
 
 
 def determine_task():
@@ -43,5 +44,7 @@ def execute():
         northern_passage.execute()
     elif SFR.task == Task.BEACHING:
         beaching.execute()
+    elif SFR.task == Task.TASKS_VISUALIZATION:
+        tasks_visualization.execute()
     else:
         explore_reef.execute_end()

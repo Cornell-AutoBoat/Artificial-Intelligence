@@ -7,7 +7,7 @@ import src.SFR as SFR
 import src.tools.utils as utils
 import numpy as np
 from src.modes.movement_modes_enum import Mode
-import rospy
+# import rospy
 import time
 
 

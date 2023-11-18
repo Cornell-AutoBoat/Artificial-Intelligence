@@ -257,67 +257,155 @@ class TestGetMidpoint(unittest.TestCase):
 
 class TestGetExtendedMidpoint(unittest.TestCase):
 
-    SFR.tx = 0
-    SFR.tz = 0
-    SFR.ty = 0
-    SFR.heading = np.pi/2 
-
     def test_basic_midpoint_functionality(self):
-        o1 = Buoy("red-buoy", 0.0, 1.0, 0.0)
-        o2 = Buoy("green-buoy", 0.0, 2.0, 0.0)
-        x = -1
-        y = 1.5
-        self.assertEqual(utils.get_extended_midpoint(
-            o1, o2, t=1), [x, y], "did not find midpoint")
-    
-    SFR.heading = 0
-    
-    
-    def test_heading_on_basic_midpoint_functionality(self): 
-        o1 = Buoy("red-buoy", 0.0, 1.0, 0.0)
-        o2 = Buoy("green-buoy", 0.0, 2.0, 0.0)
-        x = -1
-        y = 1.5
-        self.assertEqual(utils.get_extended_midpoint(
-            o1, o2, t=1), [x, y], "did not find midpoint")
-    
-
-
-    def testing_the_same_point(self):
-        o1 = Buoy("red-buoy", 0.0, 1.0, 0.0)
-        o2 = Buoy("green-buoy", 0.0, 1.0, 0.0)
-        x = -1
-        y = 1
-        self.assertEqual(utils.get_extended_midpoint(
-            o1, o2, t=1), [x, y], "same point")
-
-    SFR.tx = 1
-    SFR.tz = 0
-    SFR.ty = 1
-
-    def test_of_two_positive_points(self):
-        o1 = Buoy("red-buoy", 1.0, 5.0, 0.0)
-        o2 = Buoy("green-buoy", 5.0, 1.0, 0.0)
-        x = 4
-        y = 4
-        self.assertEqual(utils.get_extended_midpoint(
-            o1, o2, t=1), [x, y], "same point")
-
-    def test_negative_and_positive_points(self):
+        SFR.tx = 0
+        SFR.ty = 0
+        SFR.heading = np.pi/2 
         o1 = Buoy("red-buoy", -1.0, 1.0, 0.0)
         o2 = Buoy("green-buoy", 1.0, 1.0, 0.0)
         x = 0
-        y = 1
+        y = 2
         self.assertEqual(utils.get_extended_midpoint(
-            o1, o2, t=0), [x, y], "same point")
+            o1, o2, t=1), [x, y], "did not find midpoint")
+    
+    
+    def test_heading_on_basic_midpoint_functionality(self): 
+        SFR.tx = 0
+        SFR.ty = 0
+        SFR.heading = 0
+        o1 = Buoy("red-buoy", -1.0, 1.0, 0.0)
+        o2 = Buoy("green-buoy", 1.0, 1.0, 0.0)
+        x = 0
+        y = 2
+        self.assertEqual(utils.get_extended_midpoint(
+            o1, o2, t=1), [x, y], "did not find midpoint")
+    
 
-    def test_all_negative_points(self):
-        o1 = Buoy("red-buoy", -2.0, -2.0, 0.0)
-        o2 = Buoy("green-buoy", -3.0, -2.0, 0.0)
-        x = -2.5
-        y = -3.0
+    def testing_the_same_point(self):
+        SFR.tx = 1
+        SFR.ty = 1
+        SFR.heading = np.pi/2
+        o1 = Buoy("red-buoy", 0.0, 1.0, 0.0)
+        o2 = Buoy("green-buoy", 0.0, 1.0, 0.0)
+        x = 0
+        y = 2
         self.assertEqual(utils.get_extended_midpoint(
-            o1, o2, t=-1), [x, y], "same point")
+            o1, o2, t=1), [x, y], "same point")
+
+    # def test_of_two_positive_points(self):
+    #     o1 = Buoy("red-buoy", 1.0, 5.0, 0.0)
+    #     o2 = Buoy("green-buoy", 5.0, 1.0, 0.0)
+    #     x = 4
+    #     y = 4
+    #     self.assertEqual(utils.get_extended_midpoint(
+    #         o1, o2, t=1), [x, y], "same point")
+
+    # def test_negative_and_positive_points(self):
+    #     o1 = Buoy("red-buoy", -1.0, 1.0, 0.0)
+    #     o2 = Buoy("green-buoy", 1.0, 1.0, 0.0)
+    #     x = 0
+    #     y = 1
+    #     self.assertEqual(utils.get_extended_midpoint(
+    #         o1, o2, t=0), [x, y], "same point")
+
+    # def test_all_negative_points(self):
+    #     o1 = Buoy("red-buoy", -2.0, -2.0, 0.0)
+    #     o2 = Buoy("green-buoy", -3.0, -2.0, 0.0)
+    #     x = -2.5
+    #     y = -3.0
+    #     self.assertEqual(utils.get_extended_midpoint(
+    #         o1, o2, t=-1), [x, y], "same point")
+    
+    def test_nxpy_nxpy(self):
+        SFR.tx = SFR.ty = 0
+        SFR.heading = np.pi/2
+        o1 = Buoy("red-buoy", -1.0, 2.0, 0.0)
+        o2 = Buoy("green-buoy", -2.0, 1.0, 0.0)
+        self.assertEqual(utils.get_extended_midpoint(
+            o1, o2, t=np.sqrt(2)/2), [-2, 2], "wrong direction with pos t")
+        self.assertEqual(utils.get_extended_midpoint(
+            o1, o2, t=-np.sqrt(2)/2), [-1, 1], "wrong direction with neg t")
+    
+    def test_pxny_pxny(self):
+        SFR.tx = SFR.ty = 0
+        SFR.heading = np.pi/2
+        o1 = Buoy("red-buoy", 1.0, -2.0, 0.0)
+        o2 = Buoy("green-buoy", 2.0, -1.0, 0.0)
+        self.assertEqual(utils.get_extended_midpoint(
+            o2, o1, t=np.sqrt(2)/2), [2, -2], "wrong direction with pos t")
+        self.assertEqual(utils.get_extended_midpoint(
+            o2, o1, t=-np.sqrt(2)/2), [1, -1], "wrong direction with neg t")
+    
+    def test_nxny_nxny(self):
+        SFR.tx = SFR.ty = 0
+        SFR.heading = np.pi/2
+        o1 = Buoy("red-buoy", -2.0, -1.0, 0.0)
+        o2 = Buoy("green-buoy", -1.0, -2.0, 0.0)
+        self.assertEqual(utils.get_extended_midpoint(
+            o1, o2, t=np.sqrt(2)/2), [-2, -2], "wrong direction with pos t")
+        self.assertEqual(utils.get_extended_midpoint(
+            o1, o2, t=-np.sqrt(2)/2), [-1, -1], "wrong direction with neg t")
+    
+    def test_pxpy_pxpy(self):
+        SFR.tx = SFR.ty = 0
+        SFR.heading = np.pi/2
+        o1 = Buoy("red-buoy", 2.0, 1.0, 0.0)
+        o2 = Buoy("green-buoy", 1.0, 2.0, 0.0)
+        self.assertEqual(utils.get_extended_midpoint(
+            o1, o2, t=np.sqrt(2)/2), [2, 2], "wrong direction with pos t")
+        self.assertEqual(utils.get_extended_midpoint(
+            o1, o2, t=-np.sqrt(2)/2), [1, 1], "wrong direction with neg t")
+    
+    def test_nxpy_pxpy_pos_slope_centered(self):
+        SFR.tx = SFR.ty = 0
+        SFR.heading = np.pi/2
+        o1 = Buoy("red-buoy", -1.0, 1.0, 0.0)
+        o2 = Buoy("green-buoy", 1.0, 3.0, 0.0)
+        self.assertEqual(utils.get_extended_midpoint(
+            o1, o2, t=np.sqrt(2)), [-1, 3], "wrong direction with pos t")
+        self.assertEqual(utils.get_extended_midpoint(
+            o1, o2, t=-np.sqrt(2)), [1, 1], "wrong direction with neg t")
+    
+    def test_nxpy_pxpy_pos_slope_uncentered(self):
+        SFR.tx = SFR.ty = 0
+        SFR.heading = np.pi/2
+        o1 = Buoy("red-buoy", -1.0, 1.0, 0.0)
+        o2 = Buoy("green-buoy", 2.0, 4.0, 0.0)
+        self.assertEqual(utils.get_extended_midpoint(
+            o1, o2, t=np.sqrt(2)/2), [0, 3], "wrong direction with pos t")
+        self.assertEqual(utils.get_extended_midpoint(
+            o1, o2, t=-np.sqrt(2)/2), [1, 2], "wrong direction with neg t")
+        
+    def test_nxpy_pxpy_neg_slope_centered(self):
+        SFR.tx = SFR.ty = 0
+        SFR.heading = np.pi/2
+        o1 = Buoy("red-buoy", -1.0, 3.0, 0.0)
+        o2 = Buoy("green-buoy", 1.0, 1.0, 0.0)
+        self.assertEqual(utils.get_extended_midpoint(
+            o1, o2, t=np.sqrt(2)), [1, 3], "wrong direction with pos t")
+        self.assertEqual(utils.get_extended_midpoint(
+            o1, o2, t=-np.sqrt(2)), [-1, 1], "wrong direction with neg t")
+    
+    def test_nxpy_nxpy_neg_slope(self):
+        SFR.tx = SFR.ty = 0
+        SFR.heading = np.pi/2
+        o1 = Buoy("red-buoy", -2.0, 2.0, 0.0)
+        o2 = Buoy("green-buoy", -1.0, 1.0, 0.0)
+        self.assertEqual(utils.get_extended_midpoint(
+            o1, o2, t=np.sqrt(2)/2), [1, 3], "wrong direction with pos t")
+        self.assertEqual(utils.get_extended_midpoint(
+            o1, o2, t=-np.sqrt(2)/2), [-1, 1], "wrong direction with neg t")
+
+    def test_same_y(self):
+        SFR.tx = SFR.ty = 0
+        SFR.heading = np.pi/2
+        o1 = Buoy("red-buoy", -2.0, 3.0, 0.0)
+        o2 = Buoy("green-buoy", 1.0, 3.0, 0.0)
+        self.assertEqual(utils.get_extended_midpoint(
+            o1, o2, t=1), [-0.5, 4.0], "wrong direction with pos t")
+        self.assertEqual(utils.get_extended_midpoint(
+            o1, o2, t=-1), [-0.5, 2.0], "wrong direction with neg t")
+
 
 
 class TestGetShiftedExtendedMidpoint(unittest.TestCase):

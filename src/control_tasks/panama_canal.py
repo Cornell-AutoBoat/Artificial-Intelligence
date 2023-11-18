@@ -8,7 +8,7 @@ from src.tools import utils
 from src.tools.path_processing import send_to_controls, process
 from src.modes.tasks_enum import Task
 import time
-import rospy
+# import rospy
 
 # Panama Canal:
 

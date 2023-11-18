@@ -3,7 +3,7 @@ import src.SFR as SFR
 from src.tools.a_star import get_waypoints
 import numpy as np
 from src.modes.tasks_enum import Task
-import rospy
+# import rospy
 from src.buoys import Buoy
 import time
 

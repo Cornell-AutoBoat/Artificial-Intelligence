@@ -2,7 +2,7 @@ import numpy as np
 import math
 from src import SFR
 from src.tools.visualizations import path_visualizer
-from test.msg import List, MotionPlans
+# from test.msg import List, MotionPlans
 
 
 def sgn(num):
@@ -120,7 +120,7 @@ def convert_to_msg_type(path):
     return path_list
 
 
-def process(waypoints):
+def process(waypoints, fname="path.png"):
     """
     Preprocesses the list of waypoints in preparation for sending it to the controller. Performs waypoint injection and waypoint smoothing.
     Args:
@@ -130,7 +130,7 @@ def process(waypoints):
     """
     path = waypoints.copy()
     # Add the position of the boat to the start of the list of waypoints. Necessary for point injection and smoothing
-    path.insert(0, [SFR.tx, SFR.tz])
+    path.insert(0, [SFR.tx, SFR.ty])
 
     # Inject waypoints 1 meter apart
     path = inject_waypoints(path, 1)
@@ -139,10 +139,10 @@ def process(waypoints):
     path = auto_smooth(path, np.pi/3)
 
     # Convert to List[]
-    path = convert_to_msg_type(path)
+    # path = convert_to_msg_type(path)
 
     # UNCOMMENT FOR VISUALIZATIONS!! Change field size according to buoy placement
-    path_visualizer(waypoints, path, (1, 1), (-10, -5, 10, 20))
+    path_visualizer(waypoints, path, (1, 1), (-5, -5, 10, 10), fname)
 
     return path
 
