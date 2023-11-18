@@ -137,14 +137,15 @@ def get_extended_buoy(b, t=3):
     return [x, y]
 
 
-def filter_objects(labels, previously_seen=set(),  axis='y'):
+def filter_objects(labels, previously_seen=set(),  sort_by='y'):
     """
     Filter objects array to contain only objects with a label in labels, sorts 
-    the objects by specified axis, and keeps track of objects already seen.
+    the objects by specified attribute, and keeps track of objects already seen.
     Args:
         labels: list of strings.
         previously_seen: set of objects in the global frame.
-        axis: one of 'x', 'y', or 'z'.
+        sort_by: one of 'dist', 'x', 'y', or 'label'. 
+        'dist' corresponds to the euclidean distance from the boat. The other options are object attributes.
     Returns:
         objs_correct: sorted numpy array of objects in the local frame.
         seen: the updated set of objects seen in the global frame.
@@ -156,7 +157,7 @@ def filter_objects(labels, previously_seen=set(),  axis='y'):
    #new correct objects:
    #want to filter new_objs to get only objects with labels in label
     obj_correct = np.array(
-       list(filter(lambda o: o.label in labels), objs))
+       list(filter(lambda o: o.label in labels, objs)))
     
     #adding all objs to previously_seen
     for obj in objs:
@@ -166,11 +167,16 @@ def filter_objects(labels, previously_seen=set(),  axis='y'):
     if not np.all(obj_correct):
        return np.array([]), previously_seen
 
-   # sort objects by axis
+   # sort objects accordingly
     if len(obj_correct) > 0:
-       def get_attr(o): return getattr(o, axis)
-       get_axis_vals = np.vectorize(get_attr)
-       objs = objs[get_axis_vals(objs).argsort()]
+        if sort_by == "dist":
+            def get_attr(o): return np.sqrt(o.x**2 + o.y**2)
+            get_axis_vals = np.vectorize(get_attr)
+            objs = objs[get_axis_vals(objs).argsort()]
+        else:
+            def get_attr(o): return getattr(o, sort_by)
+            get_axis_vals = np.vectorize(get_attr)
+            objs = objs[get_axis_vals(objs).argsort()]
 
     return obj_correct, previously_seen
 
