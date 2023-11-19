@@ -38,7 +38,7 @@ def transition_to_task():
     else:
         midpoint = get_midpoint(begin_buoys[0], begin_buoys[1])
     global_mid = map_to_global(midpoint[0], midpoint[1])
-    path = process(global_mid)
+    path = process([global_mid])
     rospy.loginfo(f"found first gate at {global_mid}")
     send_to_controls("path", path)
     rospy.loginfo("moving towards first gate")
