@@ -258,14 +258,13 @@ def filter_signs(previously_seen= set()):
     Args:
         previously_seen: set.
     Returns:
-        signs: sorted numpy array of signs, (local)
-        previously_seen: seen objects, (global)
+        objs: sorted numpy array of signs, (local)
+        seen: seen objects, (global)
     """
     not_seen_objs = np.array(
         list(filter(lambda o: not (seen(o, previously_seen)), SFR.objects)))
 
     signs = np.array(list(filter(lambda o: o.label[-4:] == "sign", not_seen_objs)))
-
     # sort objects by axis
     if len(signs) > 0:
         def get_attr(o): return getattr(o, 'x')
@@ -278,3 +277,4 @@ def filter_signs(previously_seen= set()):
         return signs, previously_seen
     else:
         return np.array([]), previously_seen
+

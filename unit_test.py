@@ -5,6 +5,7 @@ import numpy as np
 from src.tools import utils
 
 
+
 class TestSeen(unittest.TestCase):
     def test_one_object_true(self):
 
@@ -587,6 +588,7 @@ class TestFilterCorrectSign(unittest.TestCase):
         objs, seen = utils.filter_correct_sign()
         self.assertTrue(np.array_equal(objs, np.array([])), "testing first return value")
         self.assertEqual(seen, set())
+
     def test_one_sign_true(self):
         SFR.heading = np.pi / 2
         SFR.tx, SFR.ty = 0.0, 0.0
@@ -621,7 +623,6 @@ class TestFilterCorrectSign(unittest.TestCase):
         o1g = utils.map_to_global_Buoy(o1)
         o2g = utils.map_to_global_Buoy(o2)
         self.assertTrue(set_equality(seen, {o3g, o1g, o2g}), "didn't see correct buoy")
-       
 
     def test_multiple_signs(self):
         SFR.heading = np.pi / 2
@@ -635,6 +636,7 @@ class TestFilterCorrectSign(unittest.TestCase):
         objs, seen = utils.filter_correct_sign(set())
         self.assertTrue(np.array_equal(objs, np.array([o3])), "testing first return value")
         self.assertTrue(set_equality(seen, {o1, o2, o3, o4}), "didn't see correct buoy")
+
 
     def test_multiple_signs_false(self):
         SFR.heading = np.pi / 2
