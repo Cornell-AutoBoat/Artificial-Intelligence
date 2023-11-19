@@ -3,7 +3,7 @@ from src.buoys import Buoy
 from src import SFR
 import numpy as np
 from src.tools import utils
-
+import math
 
 
 class TestSeen(unittest.TestCase):
@@ -371,8 +371,8 @@ class TestGetExtendedMidpoint(unittest.TestCase):
     def testing_the_same_point(self):
         o1 = Buoy("red-buoy", 0.0, 1.0, 0.0)
         o2 = Buoy("green-buoy", 0.0, 1.0, 0.0)
-        x = -1
-        y = 1
+        x = 0
+        y = 2
         self.assertEqual(utils.get_extended_midpoint(
             o1, o2, t=1), [x, y], "same point")
 
@@ -383,10 +383,10 @@ class TestGetExtendedMidpoint(unittest.TestCase):
     def test_of_two_positive_points(self):
         o1 = Buoy("red-buoy", 1.0, 5.0, 0.0)
         o2 = Buoy("green-buoy", 5.0, 1.0, 0.0)
-        x = 4
-        y = 4
+        x = 3
+        y = 3
         self.assertEqual(utils.get_extended_midpoint(
-            o1, o2, t=1), [x, y], "same point")
+            o1, o2, t=0), [x, y], "same point")
 
     def test_negative_and_positive_points(self):
         o1 = Buoy("red-buoy", -1.0, 1.0, 0.0)
@@ -419,7 +419,40 @@ class TestGetShiftedExtendedMidpoint(unittest.TestCase):
         y = 1
         self.assertEqual(utils.get_shifted_em(o1, o2, t=-1),
                          [x, y], "did not find midpoint")
+        
+    #Testing different docking situations 
+        
+    SFR.tx = 1
+    SFR.tz = 0
+    SFR.ty = 5
+
+    #Objects in a straight line
+    def test_docking_situation_one(self):
+        o1 = Buoy("red-buoy", -3.0, 4.0, 0.0)
+        o2 = Buoy("green-buoy", -3.0, 2.0, 0.0)
+        x = -2
+        y = 4
+        self.assertEqual(utils.get_shifted_em(o1, o2, t=-1),
+                         [x, y], "did not find midpoint")
     
+    #Objects staggered  
+    def test_docking_situation_two(self):
+        o1 = Buoy("red-buoy", -5.0, 4.0, 0.0)
+        o2 = Buoy("green-buoy", -3.0, 2.0, 0.0)
+        x = -4
+        y = 5
+        self.assertEqual(utils.get_shifted_em(o1, o2, t=-(math.pow(2.0, 0.5))),
+                         [x, y], "did not find midpoint")
+        
+    def test_docking_situation_three(self):
+        o1 = Buoy("red-buoy", -5.0, 2.0, 0.0)
+        o2 = Buoy("green-buoy", -3.0, 4.0, 0.0)
+        x = -4
+        y = 1
+        self.assertEqual(utils.get_shifted_em(o1, o2, t=-(math.pow(2.0, 0.5))),
+                         [x, y], "did not find midpoint")
+
+
     SFR.heading = 0
     
     def test_heading_effect_on_shifted_midpoint(self):
@@ -436,7 +469,7 @@ class TestGetShiftedExtendedMidpoint(unittest.TestCase):
     def test_all_positive_points_shifted_functionality(self):
         o1 = Buoy("red-buoy", 1.0, 1.0, 0.0)
         o2 = Buoy("green-buoy", 1.0, 3.0, 0.0)
-        x = 2
+        x = 0
         y = 3
         self.assertEqual(utils.get_shifted_em(o2, o1, t=-1),
                          [x, y], "did not find midpoint")
