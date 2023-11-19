@@ -7,7 +7,7 @@ import src.SFR as SFR
 import src.tools.utils as utils
 import numpy as np
 from src.modes.movement_modes_enum import Mode
-from src.tools.path_processing import Path
+from src.tools import path_processing
 import time
 
 
@@ -71,13 +71,13 @@ def pivot():
     # Once the correct number of signs is seen and the correct sign is found --> stop pivoting 
 
     if signs.size < 2 and correct_sign.size != 1:
-        Path.send_to_controls("pivot_r")
+        path_processing.send_to_controls("pivot_r")
         while signs.size < 2 and correct_sign.size != 1:
             if time.time() - start > 20:
                 break
             signs, s2 = utils.filter_signs()
             correct_sign, s1 = utils.filter_correct_sign()
-        Path.send_to_controls("stop")
+        path_processing.send_to_controls("stop")
 
 
 
@@ -122,6 +122,7 @@ def execute():
         rospy.loginfo("found sideSign: (" +
                     str(sideSign.x) + ", " + str(sideSign.z) + ")")
         waypoint = [utils.get_shifted_em(targetSign[0], sideSign, -1)]
+        waypointOfTargetSign = targetSign[0]
         rospy.loginfo("determined waypoint: " + str(waypoint))
         
 
@@ -144,36 +145,33 @@ def execute():
 
         
         # Executes path to move in front of dock
-        path = Path.process(waypoint)
-        Path.send_to_controls("path", path)
+        path = path_processing.process(waypoint)
+        path_processing.send_to_controls("path", path)
         time.sleep(0.1)
         while not SFR.pp_done: 
             pass 
-        Path.send_to_controls("stop")
+        path_processing.send_to_controls("stop")
 
         
 
         # ADD orientation code
 
-        # Move forward to pull into dock
-
-        Path.send_to_controls("fwd")
+        # Move forward to pull into dock with the target sign as waypoint
+        path2 = path_processing.process(waypointOfTargetSign)
+        path_processing.send_to_controls("path", path2)
         time.sleep(0.1)
         while not SFR.pp_done: 
             pass 
-
-        Path.send_to_controls("stop")
+        path_processing.send_to_controls("stop")
 
         # Time the boat stays parked in the dock
         time.sleep(5) 
 
         # Move backward to back out of dock
-        Path.send_to_controls("bwd")
-        time.sleep(0.1)
-        while not SFR.pp_done: 
-            pass 
-
-        Path.send_to_controls("stop")
+        path_processing.send_to_controls("bwd")
+        #Note: the time to back out of the dock can be changed depending on how far it moves
+        time.sleep(3)
+        path_processing.send_to_controls("stop")
 
 
         rospy.loginfo("done beaching")
