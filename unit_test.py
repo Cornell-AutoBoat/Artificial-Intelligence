@@ -540,7 +540,7 @@ class TestFilterObjects(unittest.TestCase):
         #previously_seen = {}  
         #new_objects = {o1,o2}
         #new_correct_objects = [o1]
-        new_correct_obj, seen_obj = utils.filter_objects(labels, {}, 'y')
+        new_correct_obj, seen_obj = utils.filter_objects(labels, set(), 'y')
         #s = {o1,o2}
         self.assertEqual(new_correct_obj, np.array([o1]))
         self.assertEqual(seen_obj, {o1,o2})
@@ -557,7 +557,7 @@ class TestFilterObjects(unittest.TestCase):
         #previously_seen = {}  
         #new_objects = {o1,o2}
         #new_correct_objects = [o1]
-        new_correct_obj, seen_obj = utils.filter_objects(labels, {}, 'y')
+        new_correct_obj, seen_obj = utils.filter_objects(labels, set(), 'y')
         #s = {o1,o2}
         self.assertEqual(new_correct_obj, np.array([o1]))
         self.assertEqual(seen_obj, {o1,o2})
@@ -584,7 +584,7 @@ class TestFilterObjects(unittest.TestCase):
         labels = ["red_buoy", "green_buoy"]
         o1 = Buoy("red_buoy", 0,0,0)
         o2 = Buoy("blue_buoy", 0,5,0)
-        previously_seen = {}
+        previously_seen = set()
         #new_objects = {o1,o2}
         #new_correct_objects = [o1]
         new_correct_obj, seen_obj = utils.filter_objects(labels, previously_seen, 'y')
@@ -598,7 +598,7 @@ class TestFilterObjects(unittest.TestCase):
         labels = ["red_buoy", "green_buoy"]
         o1 = Buoy("red_buoy", 0,0,0)
         o2 = Buoy("blue_buoy", 5,0,0)
-        previously_seen = {}
+        previously_seen = set()
         #new_objects = {o1,o2}
         #new_correct_objects = [o1]
         new_correct_obj, seen_obj = utils.filter_objects(labels, previously_seen, 'y')
