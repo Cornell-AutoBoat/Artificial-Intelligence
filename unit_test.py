@@ -274,69 +274,69 @@ class TestGetMidpoint(unittest.TestCase):
         self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
 
     def test_get_midpoint_two_close_points(self):
-        o1 = Buoy("test-buoy1", 5.22, 3.2, 0.0)
-        o11 = Buoy("test-buoy11", 5.2, 3.0, 0.0)
-        mid1 = [5.21, 3.1]
+        o1 = Buoy("test-buoy1", 5, 3, 0.0)
+        o11 = Buoy("test-buoy11", 5, 3, 0.0)
+        mid1 = [5, 3]
         self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
 
     def test_get_midpoint_two_far_points(self):
-        o1 = Buoy("test-buoy1", 3.1, 2.1, 0.0)
-        o11 = Buoy("test-buoy11", 1000.2, 20000.1, 0.0)
-        mid1 = [501.65, 10001.1]
+        o1 = Buoy("test-buoy1", 4, 2, 0.0)
+        o11 = Buoy("test-buoy11", 1000, 20000, 0.0)
+        mid1 = [502, 10001]
         self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
 
     def test_get_midpoint_q1_q2(self): 
-        o1 = Buoy("test-buoy1", 3.1, 2.1, 0.0)
-        o11 = Buoy("test-buoy11", -1000.2, 20000.1, 0.0)
-        mid1 = [-498.55, 10001.1]
+        o1 = Buoy("test-buoy1", 4, 2, 0.0)
+        o11 = Buoy("test-buoy11", -1000, 20000, 0.0)
+        mid1 = [-498, 10001]
         self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
 
     def test_get_midpoint_q1_q3(self):
-        o1 = Buoy("test-buoy1", 3.1, 2.1, 0.0)
-        o11 = Buoy("test-buoy11", -1000.2, -20000.1, 0.0)
-        mid1 = [-498.55, -9999]
+        o1 = Buoy("test-buoy1", 4, 2, 0.0)
+        o11 = Buoy("test-buoy11", -1000, -20000, 0.0)
+        mid1 = [-498, -9999]
         self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
 
     def test_get_midpoint_q1_q4(self): 
-        o1 = Buoy("test-buoy1", 3.1, 2.1, 0.0)
-        o11 = Buoy("test-buoy11", 1000.2, -20000.1, 0.0)
-        mid1 = [501.65, -9999]
+        o1 = Buoy("test-buoy1", 4, 2, 0.0)
+        o11 = Buoy("test-buoy11", 1000, -20000, 0.0)
+        mid1 = [502, -9999]
         self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
 
     def test_get_midpoint_q2_q2(self):
-        o1 = Buoy("test-buoy1", -3.1, 2.1, 0.0)
-        o11 = Buoy("test-buoy11", -1000.2, 20000.1, 0.0)
-        mid1 = [-501.65, 10001.1]
+        o1 = Buoy("test-buoy1", -4, 2, 0.0)
+        o11 = Buoy("test-buoy11", -1000, 20000, 0.0)
+        mid1 = [-502, 10001]
         self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
 
     def test_get_midpoint_q2_q3(self):
-        o1 = Buoy("test-buoy1", -3.1, 2.1, 0.0)
-        o11 = Buoy("test-buoy11", -1000.2, -20000.1, 0.0)
-        mid1 = [-501.65, -9999]
+        o1 = Buoy("test-buoy1", -4, 2, 0.0)
+        o11 = Buoy("test-buoy11", -1000, -20000, 0.0)
+        mid1 = [-502, -9999]
         self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
 
     def test_get_midpoint_q2_q4(self):
-        o1 = Buoy("test-buoy1", -3.1, 2.1, 0.0)
-        o11 = Buoy("test-buoy11", 1000.2, -20000.1, 0.0)
-        mid1 = [498.55, -9999]
+        o1 = Buoy("test-buoy1", -4, 2, 0.0)
+        o11 = Buoy("test-buoy11", 1000, -20000, 0.0)
+        mid1 = [498, -9999]
         self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
 
     def test_get_midpoint_q3_q3(self): 
-        o1 = Buoy("test-buoy1", -3.1, -2.1, 0.0)
-        o11 = Buoy("test-buoy11", -1000.2, -20000.1, 0.0)
-        mid1 = [-501.65, -10001.1]
+        o1 = Buoy("test-buoy1", -4, -2, 0.0)
+        o11 = Buoy("test-buoy11", -1000, -20000, 0.0)
+        mid1 = [-502, -10001]
         self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
 
     def test_get_midpoint_q3_q4(self):
-        o1 = Buoy("test-buoy1", -3.1, -2.1, 0.0)
-        o11 = Buoy("test-buoy11", 1000.2, -20000.1, 0.0)
-        mid1 = [498.55, -10001.1]
+        o1 = Buoy("test-buoy1", -4, -2, 0.0)
+        o11 = Buoy("test-buoy11", 1000, -20000, 0.0)
+        mid1 = [498, -10001]
         self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
 
     def test_get_midpoint_q4_q4(self): 
-        o1 = Buoy("test-buoy1", 3.1, -2.1, 0.0)
-        o11 = Buoy("test-buoy11", 1000.2, -20000.1, 0.0)
-        mid1 = [501.65, -10001.1]
+        o1 = Buoy("test-buoy1", 4, -2, 0.0)
+        o11 = Buoy("test-buoy11", 1000, -20000, 0.0)
+        mid1 = [502, -10001]
         self.assertEqual(utils.get_midpoint(o1, o11), mid1, "Unequal midpoint")
 
 
