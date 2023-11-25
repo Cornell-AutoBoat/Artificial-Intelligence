@@ -40,7 +40,7 @@ def test_panama_canal(fname):
     # Navigate through the two gates of red and green buoys
     print("attempting panama canal")
 
-    buoys, _ = utils.filter_objects(["red-buoy", "green-buoy"], sort_by='dist')
+    buoys, _ = utils.filter_objects(["red-buoy", "green-buoy"], previously_seen=set(), sort_by='dist')
     for b in buoys:
         print("label: " + b.label + ", " + "x: " + str(b.x) + ", y: " + str(b.y))
 
@@ -62,7 +62,7 @@ def test_panama_canal(fname):
     else:
         print("FAILURE")
 
-
+        
 def test_panama_canal_driver():
     SFR.tx, SFR.ty = 2.0, 1.0
     SFR.heading = 3*np.pi / 4

@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle
 from src import SFR
 from src.tools.utils import map_to_global_Buoy
 
@@ -18,9 +17,9 @@ def add_line(path):
     plt.show()
 
 
-def add_complicated_line(path, lineStyle, lineColor, lineLabel):
+def add_complicated_line(path, lineStyle, lineColor, lineLabel, markerType, markerColor):
     for i in range(0, len(path)):
-        plt.plot(path[i][0], path[i][1], '.', color='coral', markersize=10)
+        plt.plot(path[i][0], path[i][1], markerType, color=markerColor, markersize=10)
 
     for i in range(0, len(path)-1):
         if(i == 0):
@@ -56,11 +55,11 @@ def path_visualizer(orig_path, new_path, fig_size, field_size, fname):
     field = plt.figure()
     xscale, yscale = fig_size
     path_ax = field.add_axes([0, 0, xscale, yscale])
-    add_complicated_line(orig_path, '--', 'grey', 'original')
-    add_complicated_line(new_path, '--', 'orange', 'smoothed')
+    add_complicated_line(orig_path, '--', 'grey', 'original', 'x', 'magenta')
+    add_complicated_line(new_path, '--', 'orange', 'smoothed', '.', 'coral')
 
-    path_ax.plot(orig_path[0][0], orig_path[0][1], "x", color="magenta")
-    path_ax.plot(orig_path[1][0], orig_path[1][1], "x", color="magenta")
+    # path_ax.plot(orig_path[0][0], orig_path[0][1], "x", color="magenta")
+    # path_ax.plot(orig_path[1][0], orig_path[1][1], "x", color="magenta")
 
     xMin, yMin, xMax, yMax = field_size
 

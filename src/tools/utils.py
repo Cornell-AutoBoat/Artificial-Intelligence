@@ -57,6 +57,7 @@ def map_to_global_Buoy(b):
         global_b: Buoy object defined in the global frame 
     """
     x_global, y_global = map_to_global(b.x, b.y)
+
     global_b = Buoy(b.label, x_global, y_global)
     return global_b
 
@@ -137,42 +138,48 @@ def get_extended_buoy(b, t=3):
     return [x, y]
 
 
-def filter_objects(labels, previously_seen=[],  sort_by='y'):
+def filter_objects(labels, previously_seen=set(),  sort_by='y'):
     """
     Filter objects array to contain only objects with a label in labels, sorts 
     the objects by specified attribute, and keeps track of objects already seen.
     Args:
         labels: list of strings.
-        previously_seen: set.
+        previously_seen: set of objects in the global frame.
         sort_by: one of 'dist', 'x', 'y', or 'label'. 
         'dist' corresponds to the euclidean distance from the boat. The other options are object attributes.
     Returns:
-        objs: sorted numpy array of objects.
-        seen: the updated set of objects seen.
+        objs_correct: sorted numpy array of objects in the local frame.
+        seen: the updated set of objects seen in the global frame.
     """
-
-    # objs only has objects with a label in labels
+    # filter out objects which already exist in the previously_seen set
     objs = np.array(
-        list(filter(lambda o: not (seen(o, previously_seen)) and o.label in labels, SFR.objects)))
+       list(filter(lambda o: not (seen(o, previously_seen)), SFR.objects)))
 
+    # filter out objects with the wrong label
+    obj_correct = np.array(
+       list(filter(lambda o: o.label in labels, objs)))
+
+    # adding all objs to previously_seen set
+    for obj in objs:
+       previously_seen.add(map_to_global_Buoy(obj))
+  
     # if we see no objects that fit criteria return empty set
-    if not np.all(objs):
-        return np.array([]), previously_seen
+    if not np.all(obj_correct):
+       return np.array([]), previously_seen
 
     # sort objects accordingly
-    if len(objs) > 0:
+    if len(obj_correct) > 0:
         if sort_by == "dist":
             def get_attr(o): return np.sqrt(o.x**2 + o.y**2)
             get_axis_vals = np.vectorize(get_attr)
-            objs = objs[get_axis_vals(objs).argsort()]
+            obj_correct = obj_correct[get_axis_vals(obj_correct).argsort()]
         else:
             def get_attr(o): return getattr(o, sort_by)
             get_axis_vals = np.vectorize(get_attr)
-            objs = objs[get_axis_vals(objs).argsort()]
+            obj_correct = obj_correct[get_axis_vals(obj_correct).argsort()]
 
-    s = np.concatenate((previously_seen, objs))
+    return obj_correct, previously_seen
 
-    return objs, s
 
 
 def pivot_to_gate(s):
@@ -219,7 +226,7 @@ def pivot_to_gate(s):
     return gate, s
 
 
-def filter_correct_sign(previously_seen=[]):
+def filter_correct_sign(previously_seen=set()):
     """
     Filter objects array to contain only the sign with the correct color.
     Args:
@@ -228,39 +235,44 @@ def filter_correct_sign(previously_seen=[]):
         objs: sorted numpy array of correct sign
         seen: seen objects
     """
-    signs = np.array(
-        list(filter(lambda o: not (seen(o, previously_seen)) and o.label[0] == SFR.sign_color and o.label[-5:] == "thing", SFR.objects)))
-    s = previously_seen + signs
-
+    not_seen_objs = np.array(
+        list(filter(lambda o: not (seen(o, previously_seen)), SFR.objects)))
+    
+    signs = np.array(list(filter(lambda o: o.label[0] == SFR.sign_color and o.label[-4:] == "sign", not_seen_objs)))
+    
+    for obj in not_seen_objs:
+        objGlobal = map_to_global_Buoy(obj)
+        previously_seen.add(objGlobal)
+    
     if signs.size == 1:
-        return signs, s
+        return signs, previously_seen
     else:
         return np.array([]), previously_seen
 
 
-def filter_signs(previously_seen=[]):
+def filter_signs(previously_seen= set()):
     """
     Filter objects array to contain only objects with a label in labels, sorts 
-    the objects by specified axis, and keeps track of objects already seen.
+    the objects by the x-axis, and keeps track of objects already seen.
     Args:
         previously_seen: set.
     Returns:
-        objs: sorted numpy array of signs
-        seen: seen objects
+        signs: sorted numpy array of signs, (local)
+        previously_seen: seen objects, (global)
     """
+    not_seen_objs = np.array(
+        list(filter(lambda o: not (seen(o, previously_seen)), SFR.objects)))
 
-    signs = np.array(
-        list(filter(lambda o: not (seen(o, previously_seen)) and o.label[-4:] == "sign", SFR.objects)))
-
+    signs = np.array(list(filter(lambda o: o.label[-4:] == "sign", not_seen_objs)))
     # sort objects by axis
     if len(signs) > 0:
         def get_attr(o): return getattr(o, 'x')
         get_axis_vals = np.vectorize(get_attr)
         signs = signs[get_axis_vals(signs).argsort()]
-
-    s = np.concatenate((previously_seen, signs))
-
-    if signs.size > 1:
-        return signs, s
+    for obj in not_seen_objs:
+        objGlobal = map_to_global_Buoy(obj)
+        previously_seen.add(objGlobal)
+    if signs.size >= 1:
+        return signs, previously_seen
     else:
         return np.array([]), previously_seen
