@@ -97,7 +97,7 @@ def execute():
 
     rospy.loginfo("attempting panama canal")
 
-    buoys, _ = utils.filter_objects(["red-column-buoy", "green-column-buoy"], sort_by='dist')
+    buoys, _ = utils.filter_objects(["red-column-buoy", "green-column-buoy"], previously_seen=set(), sort_by='dist')
     waypoints = []
     if len(buoys) == 4:
         rospy.loginfo("all buoys seen immediately")
