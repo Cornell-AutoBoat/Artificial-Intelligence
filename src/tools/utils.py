@@ -151,33 +151,32 @@ def filter_objects(labels, previously_seen=set(),  sort_by='y'):
         objs_correct: sorted numpy array of objects in the local frame.
         seen: the updated set of objects seen in the global frame.
     """
-
+    # filter out objects which already exist in the previously_seen set
     objs = np.array(
        list(filter(lambda o: not (seen(o, previously_seen)), SFR.objects)))
-   #maybe delete this part: and o.label in labels
-   #new correct objects:
-   #want to filter new_objs to get only objects with labels in label
+
+    # filter out objects with the wrong label
     obj_correct = np.array(
        list(filter(lambda o: o.label in labels, objs)))
-    
-    #adding all objs to previously_seen
+
+    # adding all objs to previously_seen set
     for obj in objs:
        previously_seen.add(map_to_global_Buoy(obj))
   
-   # if we see no objects that fit criteria return empty set
+    # if we see no objects that fit criteria return empty set
     if not np.all(obj_correct):
        return np.array([]), previously_seen
 
-   # sort objects accordingly
+    # sort objects accordingly
     if len(obj_correct) > 0:
         if sort_by == "dist":
             def get_attr(o): return np.sqrt(o.x**2 + o.y**2)
             get_axis_vals = np.vectorize(get_attr)
-            objs = objs[get_axis_vals(objs).argsort()]
+            obj_correct = obj_correct[get_axis_vals(obj_correct).argsort()]
         else:
             def get_attr(o): return getattr(o, sort_by)
             get_axis_vals = np.vectorize(get_attr)
-            objs = objs[get_axis_vals(objs).argsort()]
+            obj_correct = obj_correct[get_axis_vals(obj_correct).argsort()]
 
     return obj_correct, previously_seen
 

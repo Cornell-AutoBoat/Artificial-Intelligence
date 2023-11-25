@@ -40,7 +40,7 @@ def test_panama_canal(fname):
     # Navigate through the two gates of red and green buoys
     print("attempting panama canal")
 
-    buoys, _ = utils.filter_objects(["red-buoy", "green-buoy"], sort_by='dist')
+    buoys, _ = utils.filter_objects(["red-buoy", "green-buoy"], previously_seen=set(), sort_by='dist')
     for b in buoys:
         print("label: " + b.label + ", " + "x: " + str(b.x) + ", y: " + str(b.y))
 
