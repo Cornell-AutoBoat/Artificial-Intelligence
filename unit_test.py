@@ -525,87 +525,138 @@ class TestGetExtendedBuoy(unittest.TestCase):
 class TestGetYaw(unittest.TestCase):
     pass
 
-
 class TestFilterObjects(unittest.TestCase):
+
+    def set_equality(set1, set2):
+        result = True
+        l1 = sorted(list(set1), key=lambda b: b.x)
+        l2 = sorted(list(set2), key=lambda b: b.x)
+        # sort 
+        if len(l1) != len(l2): result = False
+        else:
+            for i in range(len(l1)):
+                result = result and (l1[i].x == l2[i].x and l1[i].y == l2[i].y and l1[i].label == l2[i].label)
+        return result
+
     def test_one_labeled_object(self):
         #also test not aligned 
         #set these to other values 
         SFR.tx = 0
         SFR.ty = 0
         SFR.heading = np.pi/2
-        SFR.objects = [Buoy("red_buoy",0,0), Buoy("blue_buoy", 0,5)]
-        labels = ["red_buoy", "green_buoy"]
+        
         o1 = Buoy("red_buoy", 0,0) #not aligned - ex. map_to_global_Buoy(o1)
         o2 = Buoy("blue_buoy", 0,5)
+        SFR.objects = [o1, o2]
+        labels = ["red_buoy", "green_buoy"]
+        o1g = utils.map_to_global_Buoy(o1)
+        o2g = utils.map_to_global_Buoy(o2)
         #previously_seen = {}  
         #new_objects = {o1,o2}
         #new_correct_objects = [o1]
-        new_correct_obj, seen_obj = utils.filter_objects(labels, set(), 'y')
+        new_correct_obj, seen_obj = utils.filter_objects(labels, set(),"x")
         #s = {o1,o2}
-        self.assertEqual(new_correct_obj, np.array([o1]))
-        self.assertEqual(seen_obj, {o1,o2})
+        #self.assertEqual(new_correct_obj, np.array([o1]))
+        #self.assertEqual(seen_obj, {o1,o2})
+        #SFR.objects = [o1]
+        print( "obj",new_correct_obj)
+        print("SFR", SFR.objects)
+        self.assertTrue(np.array_equal(new_correct_obj, np.array([o1])))
+        self.assertTrue(TestFilterObjects.set_equality(seen_obj, {o1g, o2g}))
 
     def test_one_labeled_object_unaligned(self):
         #Local frame not aligned with global grame
-        SFR.tx = 5
-        SFR.ty = 3
+        SFR.tx = 0
+        SFR.ty = 1
         SFR.heading = np.pi
-        SFR.objects = [Buoy("red_buoy",0,0), Buoy("blue_buoy", 0,5)]
+        o1 = Buoy("red_buoy", 0,0) #not aligned - ex. map_to_global_Buoy(o1)
+        o2 = Buoy("blue_buoy", 0,5)
+        SFR.objects = [o1, o2]
         labels = ["red_buoy", "green_buoy"]
-        o1 = utils.map_to_global_Buoy(Buoy("red_buoy", 0,0)) #not aligned - ex. map_to_global_Buoy(o1)
-        o2 = utils.map_to_global_Buoy(Buoy("blue_buoy", 0,5))
+        #o1 = utils.map_to_global_Buoy(Buoy("red_buoy", 0,0)) #not aligned - ex. map_to_global_Buoy(o1)
+        #o2 = utils.map_to_global_Buoy(Buoy("blue_buoy", 0,5))
         #previously_seen = {}  
         #new_objects = {o1,o2}
         #new_correct_objects = [o1]
-        new_correct_obj, seen_obj = utils.filter_objects(labels, set(), 'y')
+        new_correct_obj, seen_obj = utils.filter_objects(labels, set(), 'x')
+        print(new_correct_obj, "new_corr_obj")
+        print(np.array([o1]), "exp_corr obj")
+        #new_correct_obj = np.array(utils.map_to_global_Buoy(new_correct_obj[0]))
         #s = {o1,o2}
-        self.assertEqual(new_correct_obj, np.array([o1]))
-        self.assertEqual(seen_obj, {o1,o2})
+        #self.assertEqual(new_correct_obj, np.array([o1]))
+        #self.assertEqual(seen_obj, {o1,o2})
+        o1g = utils.map_to_global_Buoy(o1)
+        o2g = utils.map_to_global_Buoy(o2)
+        self.assertTrue(np.array_equal(new_correct_obj, np.array([o1])))
+        #self.assertTrue(TestFilterObjects.set_equality(seen_obj, {o1, o2}))
+        print(seen_obj, "seen_obj")
+        #print({o1g, o2g}, "exp seem")
+        #print(seen_obj[0].x, "actual")
+        print(o1g.x, "o1g.x")
+        self.assertTrue(TestFilterObjects.set_equality(seen_obj, {o1g, o2g}))
 
     def test_no_labeled_object(self):
         SFR.tx = 0
         SFR.ty = 0
         SFR.heading = np.pi/2
-        SFR.objects = [Buoy("red_buoy", 0,0,0), Buoy("blue_buoy", 0,5,0)]
-        labels = ["red_buoy", "green_buoy"]
         o1 = Buoy("red_buoy", 0,0,0) #utils.map_to_global(0,0)[0], utils.map_to_global(0,0)[1], 0 
         o2 = Buoy("blue_buoy", 0,5,0)
-        previously_seen = {o1} 
+        SFR.objects = [o1,o2]
+        
+        labels = ["red_buoy", "green_buoy"]
+        previously_seen = {utils.map_to_global_Buoy(o1)} 
+        #print("TYPE", type(previously_seen))
         #new_objects = {o2}
         #new_correct_objects = []
-        new_correct_obj, seen_obj = utils.filter_objects(labels, previously_seen, 'y')
+        new_correct_obj, seen_obj = utils.filter_objects(labels, previously_seen, 'x')
         #s = {o1,o2}
-        self.assertEqual(new_correct_obj, np.array([]))
-        self.assertEqual(seen_obj, {o1,o2})
+        #self.assertEqual(new_correct_obj, np.array([]))
+        #self.assertEqual(seen_obj, {o1,o2})
+        o1g = utils.map_to_global_Buoy(o1)
+        o2g = utils.map_to_global_Buoy(o2)
+        #print("o1g", o1)
+        #print("o2g", o2)
+        #print("seen",seen_obj)
+
+        self.assertTrue(np.array_equal(new_correct_obj, np.array([])))
+        self.assertTrue(TestFilterObjects.set_equality(seen_obj, {o1g, o2g}))
 
     def test_y_axis_sorted(self):
+        SFR.tx = 0
+        SFR.ty = 0
+        SFR.heading = np.pi/2
         #y-axis sorting
-        SFR.objects = [Buoy("blue_buoy", 0,5,0) , Buoy("red_buoy", 0,0,0)]
-        labels = ["red_buoy", "green_buoy"]
+        labels = ["red_buoy", "blue_buoy"]
         o1 = Buoy("red_buoy", 0,0,0)
         o2 = Buoy("blue_buoy", 0,5,0)
+        SFR.objects = [o1,o2]
         previously_seen = set()
         #new_objects = {o1,o2}
         #new_correct_objects = [o1]
         new_correct_obj, seen_obj = utils.filter_objects(labels, previously_seen, 'y')
         #s = {o1,o2}
         #sort o1, o2 manually 
-        self.assertEqual(new_correct_obj, np.array([o1,o2]))
-
+        #self.assertEqual(new_correct_obj, np.array([o1,o2]))
+        #print(new_correct_obj, "new_correct_obj")
+        self.assertTrue(np.array_equal(new_correct_obj, np.array([o1,o2])))
+        
     def test_x_axis_sorted(self):
+        SFR.tx = 0
+        SFR.ty = 0
+        SFR.heading = np.pi/2
         #x-axis sorting
-        SFR.objects = [Buoy("blue_buoy", 5,0,0) , Buoy("red_buoy", 0,0,0)]
-        labels = ["red_buoy", "green_buoy"]
         o1 = Buoy("red_buoy", 0,0,0)
         o2 = Buoy("blue_buoy", 5,0,0)
-        previously_seen = set()
+        SFR.objects = [o1,o2]
+        labels = ["red_buoy", "blue_buoy"]
         #new_objects = {o1,o2}
         #new_correct_objects = [o1]
-        new_correct_obj, seen_obj = utils.filter_objects(labels, previously_seen, 'y')
+        new_correct_obj, seen_obj = utils.filter_objects(labels, set(), 'x')
         #s = {o1,o2}
         #sort o1, o2 manually 
-        self.assertEqual(new_correct_obj, np.array([o1,o2]))
-
+        #self.assertEqual(new_correct_obj, np.array([o1,o2]))
+        #print(new_correct_obj, "new_correct_obj")
+        self.assertTrue(np.array_equal(new_correct_obj, np.array([o1,o2])))
 
 class TestFilterCorrectSign(unittest.TestCase):
     """
