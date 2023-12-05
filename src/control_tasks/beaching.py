@@ -53,8 +53,7 @@ def pivot():
     signs, s2 = findSigns(SFR.objects)
 
     start = time.time()
-    sL = 1500
-    sR = 1500
+
     # Boat takes 2 pi seconds to pivot in a full circle at 1 rad/sec
     
     #old pivot code 
@@ -106,7 +105,6 @@ def pivotToGoalSign():
         while correct_sign.size != 1:
             if time.time() - start > 20:
                 break
-            signs, s2 = utils.filter_signs()
             correct_sign, s1 = utils.filter_correct_sign()
         path_processing.send_to_controls("stop")
 
@@ -149,27 +147,17 @@ def execute():
 
         rospy.loginfo("found sideSign: (" +
                     str(sideSign.x) + ", " + str(sideSign.z) + ")")
-        waypoint = [utils.get_shifted_em(targetSign[0], sideSign, -1)]
+        flipSign = 1
+
+        if (sideSign.x < targetSign[0].x) : 
+            flipSign = flipSign * -1
+
+
+        waypoint = [utils.get_shifted_em(targetSign[0], sideSign, 8 * flipSign)]
         waypointOfTargetSign = targetSign[0]
         rospy.loginfo("determined waypoint: " + str(waypoint))
         
 
-        ####### CHANGE (should perform same task as waypoint above, no longer needed)
-        """"       
-        rospy.loginfo("found sideSign: (" +
-                     str(sideSign.x) + ", " + str(sideSign.z) + ")")
-        yDifference = np.absolute(sideSign.y - targetY)
-        xDifference = np.absolute(sideSign.x - targetX)
-        slopeTarget = -1* yDifference / xDifference
-        univertedSlope = xDifference / yDifference
-        currLocX = SFR.tx
-        currLocY = SFR.ty
-        currLocZ = SFR.tz
-        waypointX = ((univertedSlope * currLocX) +  currLocY + ((slopeTarget)*targetSign[0].x) - targetSign[0].y)/(slopeTarget - invertedSlope)
-        waypointY = (slopeTarget(tx-targetSign[0].x)+ targetSign[0].y)
-        waypoint2 = [utils.get_shifted_em(targetSign[0], sideSign, -1)]
-        #sL, sR = pure_pursuit.execute(waypoint2) 
-        """
 
         
         # Executes path to move in front of dock
@@ -180,9 +168,7 @@ def execute():
             pass 
         path_processing.send_to_controls("stop")
 
-        
-
-        # ADD orientation code
+    
 
         # pivot until you see the buoy 
         # get the potenital heading of the boat when it's facing the obejct  
