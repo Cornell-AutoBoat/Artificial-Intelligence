@@ -149,7 +149,7 @@ def process(waypoints, fname="path.png"):
 
 def send_to_controls(motion_type, path=[]):
     """
-    Publish a message to Controls containing the motion type and path.
+    Publish a message to Controls containing the motion type, path, and current task being executed.
     Args:
         motion type: Must be one of the following strings: "path", "fwd", "bwd", "pivot_l", "pivot_r", "stop"
         path: 2D list in the form List[]
@@ -157,4 +157,5 @@ def send_to_controls(motion_type, path=[]):
     msg = MotionPlans()
     msg.motion_type = motion_type
     msg.path = path
+    msg.task = SFR.task.name
     SFR.mcPub.publish(msg)
