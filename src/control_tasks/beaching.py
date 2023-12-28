@@ -9,6 +9,7 @@ import numpy as np
 from src.modes.movement_modes_enum import Mode
 from src.tools import path_processing
 import time
+import math
 
 
 def findCorrectSign(objects, previously_seen=set()):
@@ -52,8 +53,7 @@ def pivot():
     signs, s2 = findSigns(SFR.objects)
 
     start = time.time()
-    sL = 1500
-    sR = 1500
+
     # Boat takes 2 pi seconds to pivot in a full circle at 1 rad/sec
     
     #old pivot code 
@@ -87,6 +87,32 @@ def pivot():
         return 0, signs, correct_sign
     return 1, signs, correct_sign
 
+def pivotToGoalSign():
+    # if correct sign not seen, pivot until seen
+    correct_sign, s1 = findCorrectSign(SFR.objects)
+
+    start = time.time()
+    sL = 1500
+    sR = 1500
+    # Boat takes 2 pi seconds to pivot in a full circle at 1 rad/sec
+    
+    
+    # If the correct sign is not seen --> pivot 
+    # Once the the correct sign is found --> stop pivoting 
+
+    if correct_sign.size != 1:
+        path_processing.send_to_controls("pivot_r")
+        while correct_sign.size != 1:
+            if time.time() - start > 20:
+                break
+            correct_sign, s1 = utils.filter_correct_sign()
+        path_processing.send_to_controls("stop")
+
+
+    # not enough signs seen
+    if correct_sign.size != 1:
+        return 0, correct_sign
+    return 1, correct_sign
 
 def execute():
     # Determine assigned docking position from color/shape
@@ -121,27 +147,17 @@ def execute():
 
         rospy.loginfo("found sideSign: (" +
                     str(sideSign.x) + ", " + str(sideSign.z) + ")")
-        waypoint = [utils.get_shifted_em(targetSign[0], sideSign, -1)]
+        flipSign = 1
+
+        if (sideSign.x < targetSign[0].x) : 
+            flipSign = flipSign * -1
+
+
+        waypoint = [utils.get_shifted_em(targetSign[0], sideSign, 8 * flipSign)]
         waypointOfTargetSign = targetSign[0]
         rospy.loginfo("determined waypoint: " + str(waypoint))
         
 
-        ####### CHANGE (should perform same task as waypoint above, no longer needed)
-        """"       
-        rospy.loginfo("found sideSign: (" +
-                     str(sideSign.x) + ", " + str(sideSign.z) + ")")
-        yDifference = np.absolute(sideSign.y - targetY)
-        xDifference = np.absolute(sideSign.x - targetX)
-        slopeTarget = -1* yDifference / xDifference
-        univertedSlope = xDifference / yDifference
-        currLocX = SFR.tx
-        currLocY = SFR.ty
-        currLocZ = SFR.tz
-        waypointX = ((univertedSlope * currLocX) +  currLocY + ((slopeTarget)*targetSign[0].x) - targetSign[0].y)/(slopeTarget - invertedSlope)
-        waypointY = (slopeTarget(tx-targetSign[0].x)+ targetSign[0].y)
-        waypoint2 = [utils.get_shifted_em(targetSign[0], sideSign, -1)]
-        #sL, sR = pure_pursuit.execute(waypoint2) 
-        """
 
         
         # Executes path to move in front of dock
@@ -152,9 +168,41 @@ def execute():
             pass 
         path_processing.send_to_controls("stop")
 
-        
+    
 
-        # ADD orientation code
+        # pivot until you see the buoy 
+        # get the potenital heading of the boat when it's facing the obejct  
+        # pivot until the the boat's global heading is within the range of the object 
+
+        num, correctSign = pivotToGoalSign()
+        if num == 0: 
+            finish("FAIL")
+            rospy.loginfo("Signs not seen")
+        elif num == 1: 
+            localX = correctSign[0].x 
+            localY = correctSign[0].y 
+            # match the heading with the location of this sign 
+            globalX, globalY = utils.map_to_global(localX, localY)
+            psi = math.atan(globalY / globalX)
+            # wrapping around to match the angle of the target sign to it's heading value
+            headingVal = psi
+            if globalX < 0 and globalY > 0 : 
+                headingVal = -psi + (math.pi / 2)
+            elif globalX < 0 and globalY < 0: 
+                headingVal = - (math.pi - psi)
+            elif globalX > 0 and globalY < 0: 
+                headingVal = -psi
+            
+            # pivot until the heading matches the angle of the buoy with a 5 degree buffer 
+            start = time.time()
+            if (SFR.heading > headingVal + 0.0872665 or SFR.heading < headingVal - 0.0872665 ) : 
+                path_processing.send_to_controls("pivot_l")
+                while (SFR.heading >= headingVal + 0.0872665 or SFR.heading <= headingVal - 0.0872665 ):
+                    if time.time() - start > 20:
+                        break
+                path_processing.send_to_controls("stop")
+
+ 
 
         # Move forward to pull into dock with the target sign as waypoint
         path2 = path_processing.process(waypointOfTargetSign)
