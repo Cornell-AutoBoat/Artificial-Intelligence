@@ -45,6 +45,12 @@ def filter_buoys(objects):
     return ordered_buoys
 
 
+def filter_blue(objects):
+    # empty list each time
+    buoys = np.array(list(filter(lambda b: b.label == "blue-buoy", objects)))
+    return buoys
+
+
 def pivot():
 
     # use the uti; filter_buoys
@@ -60,59 +66,106 @@ def pivot():
             # if only a green buoy is seen
             if buoys[0].label == "green-buoy":
                 while (not ((buoys[0] == "blue-buoy" or buoys[0] == "yellow-buoy") and buoys[1] == "red-buoy" and buoys[2] == "green-buoy")):
-                    sL, sR = thruster_utils.move_pivot("R")
+                    send_to_controls("pivot_r")
+                    # sL, sR = thruster_utils.move_pivot("R")
                     buoys = filter_buoys(SFR.objects)
                     if (buoys[0] == "green-buoy" and buoys[1] == "red-buoy"):
-                        sL, sR = pure_pursuit.execute(
-                            utils.get_extended_midpoint(buoys[0], buoys[1], -1.75))
+                        path1 = process(utils.get_extended_midpoint(
+                            buoys[0], buoys[1], -1.75))
+                        send_to_controls("path", path1)
+                        time.sleep(0.1)
+                        while not SFR.pp_done:
+                            pass
+                        send_to_controls("stop")
+                       # sL, sR = pure_pursuit.execute(
+                        # utils.get_extended_midpoint(buoys[0], buoys[1], -1.75))
                         buoys = filter_buoys(SFR.objects)
-                thruster_utils.break_thrusters(sL, sR)
+                send_to_controls("stop")
+                # thruster_utils.break_thrusters(sL, sR)
         # if only a red buoy is seen
             elif buoys[0].label == "red-buoy":
                 while (not ((buoys[0] == "blue-buoy" or buoys[0] == "yellow-buoy") and buoys[1] == "red" and buoys[2] == "green-buoy")):
-                    sL, sR = thruster_utils.move_pivot("L")
+                    send_to_controls("pivot_l")
+                    # sL, sR = thruster_utils.move_pivot("L")
                     buoys = filter_buoys(SFR.objects)
                     if (buoys[0] == "green-buoy" and buoys[1] == "red-buoy"):
-                        sL, sR = pure_pursuit.execute(
-                            utils.get_extended_midpoint(buoys[0], buoys[1], -1.75))
+
+                        path1 = process(utils.get_extended_midpoint(
+                            buoys[0], buoys[1], -1.75))
+                        send_to_controls("path", path1)
+                        time.sleep(0.1)
+                        while not SFR.pp_done:
+                            pass
+                        send_to_controls("stop")
+                        # sL, sR = pure_pursuit.execute(
+                        # utils.get_extended_midpoint(buoys[0], buoys[1], -1.75))
                         buoys = filter_buoys(SFR.objects)
-                thruster_utils.break_thrusters(sL, sR)
+                send_to_controls("stop")
+                # thruster_utils.break_thrusters(sL, sR)
         # when 2 buoys are seen
         if buoys[0].label == "green-buoy" and buoys[1].label == "red-buoy":
-            sL, sR = pure_pursuit.execute(
-                utils.get_extended_midpoint(buoys[0], buoys[1], -1.75))
+            path1 = process(utils.get_extended_midpoint(
+                buoys[0], buoys[1], -1.75))
+            send_to_controls("path", path1)
+            time.sleep(0.1)
+            while not SFR.pp_done:
+                pass
+            send_to_controls("stop")
+            # sL, sR = pure_pursuit.execute(
+            # utils.get_extended_midpoint(buoys[0], buoys[1], -1.75))
             # see new buoys
             buoys = filter_buoys(SFR.objects)
-            thruster_utils.break_thrusters(sL, sR)
+            send_to_controls("stop")
+            # thruster_utils.break_thrusters(sL, sR)
         # if a blue and red buoy are seen, but not a green
         if buoys[0].label == "blue-buoy" and buoys[1].label == "red-buoy":
-            sL, sR = 1450, 1550
-            thruster_utils.sendValue(sL, sR)
+            # sL, sR = 1450, 1550
+            # thruster_utils.sendValue(sL, sR)
+            send_to_controls("fwd")
             start = time.time()
             while (not ((buoys[0] == "blue-buoy" or buoys[0] == "yellow-buoy") and buoys[1] == "red-buoy" and buoys[2] == "green-buoy")):
                 buoys = filter_buoys(SFR.objects)
                 if time.time() - start > 20:
-                    thruster_utils.break_thrusters(sL, sR)
+                    send_to_controls("stop")
+                    # thruster_utils.break_thrusters(sL, sR)
                     finish("FAILURE")
-            thruster_utils.break_thrusters(sL, sR)
-            sL, sR = pure_pursuit.execute(
-                utils.get_extended_midpoint(buoys[0], buoys[1], -1.75))
-            thruster_utils.break_thrusters(sL, sR)
+            send_to_controls("stop")
+            # thruster_utils.break_thrusters(sL, sR)
+            path1 = process(utils.get_extended_midpoint(
+                buoys[0], buoys[1], -1.75))
+            send_to_controls("path", path1)
+            time.sleep(0.1)
+            while not SFR.pp_done:
+                pass
+            send_to_controls("stop")
+            # sL, sR = pure_pursuit.execute(
+            # utils.get_extended_midpoint(buoys[0], buoys[1], -1.75))
             buoys = filter_buoys(SFR.objects)
         # if a yellow and red buoy are seen, but not a green
         if buoys[0].label == "yellow-buoy" and buoys[1].label == "red-buoy":
-            sL, sR = 1450, 1550
-            thruster_utils.sendValue(sL, sR)
+            # sL, sR = 1450, 1550
+            # thruster_utils.sendValue(sL, sR)
+            send_to_controls("fwd")
             start = time.time()
             while (not ((buoys[0] == "blue-buoy" or buoys[0] == "yellow-buoy") and buoys[1] == "green-buoy" and buoys[2] == "red-buoy")):
                 buoys = filter_buoys(SFR.objects)
                 if time.time() - start > 20:
-                    thruster_utils.break_thrusters(sL, sR)
+                    send_to_controls("stop")
+                    # thruster_utils.break_thrusters(sL, sR)
                     finish("FAILURE")
-            thruster_utils.break_thrusters(sL, sR)
-            sL, sR = pure_pursuit.execute(
-                utils.get_extended_midpoint(buoys[0], buoys[1], -1.75))
-            thruster_utils.break_thrusters(sL, sR)
+            send_to_controls("stop")
+            # thruster_utils.break_thrusters(sL, sR)
+
+            path1 = process(utils.get_extended_midpoint(
+                buoys[0], buoys[1], -1.75))
+            send_to_controls("path", path1)
+            time.sleep(0.1)
+            while not SFR.pp_done:
+                pass
+            send_to_controls("stop")
+            # sL, sR = pure_pursuit.execute(
+            # utils.get_extended_midpoint(buoys[0], buoys[1], -1.75))
+            # thruster_utils.break_thrusters(sL, sR)
             buoys = filter_buoys(SFR.objects)
     # no buoys seen
     if len(buoys) < 3:
@@ -123,18 +176,24 @@ def get_to_challenge():
     # pivot before transitioning to the northern passage task
     buoys = filter_buoys(SFR.objects)
     # pivot right initially to avoid seeing the red buoy from the magellans route task
-    sL, sR = 1450, 1550
-    thruster_utils.sendValue(sL, sR)
+    # sL, sR = 1450, 1550
+    # thruster_utils.sendValue(sL, sR)
+    send_to_controls("pivot_r")
     start = time.time()
     while (buoys[0].label != "red-buoy" and buoys[1].label != "green-buoy"):
         buoys = filter_buoys(SFR.objects)
         if time.time() - start > 15:
-            thruster_utils.break_thrusters(sL, sR)
+            send_to_controls("stop")
+            # thruster_utils.break_thrusters(sL, sR)
             finish("FAILURE")
-    thruster_utils.break_thrusters(sL, sR)
-    pure_pursuit.execute(utils.get_extended_buoy(buoys[0], t=3))
+    send_to_controls("stop")
+   # thruster_utils.break_thrusters(sL, sR)
+    send_to_controls("path", utils.get_extended_buoy(buoys[0], t=3))
+    # pure_pursuit.execute(utils.get_extended_buoy(buoys[0], t=3))
 
 
+# have path_obstruction function cover this case.
+"""
 def cal_point3():
     waypoints = []
     buoys = filter_buoys(SFR.objects)
@@ -172,6 +231,7 @@ def cal_point3():
                 buoys = filter_buoys(SFR.objects)
 
     return waypoints
+"""
 
 
 def create_waypoints():
@@ -262,21 +322,24 @@ def create_waypoints():
 
 
 def execute():
+    # boat 3 ft wide, buoy diameter 36.8 cm
+    # 1 + half of boat width + buoy raidus?
+    avoidance_length = 1 + 18.4 + 45.72
     rospy.loginfo("attempting northern passage")
     rospy.loginfo("attempting to transition to northern passage")
     get_to_challenge()
-
     rospy.loginfo("attempting to pivot and indentify three buoys")
     pivot()
 
     waypoints = create_waypoints()
-    first_path = waypoints[0]
-    final_path = waypoints[1]
-    sL, sR = pure_pursuit.execute(first_path)
-    third_point = cal_point3()
-    sL, sR = pure_pursuit.execute(third_point)
-    sL, sR = pure_pursuit.execute(final_path)
-    thruster_utils.break_thrusters(sL, sR)
+    path_obstruction(waypoints, avoidance_length)
+    # full_path_process = process(waypoints)
+    # send_to_controls("path", full_path_process)
+    # time.sleep(0.1)
+    # while not SFR.pp_done:
+    # path_obstruction(full_path_process, avoidance_length)
+    # send_to_controls("stop")
+
     for wp in waypoints:
         rospy.loginfo("determined waypoint: " + str(wp))
 
@@ -296,40 +359,41 @@ def finish(outcome):
         SFR.task = Task.DETERMINE_TASK
 
 
-def avoid_intersection(blue_buoy, path, avoidance_length=1):
+def avoid_intersection(blue_buoy, path, avoidance_length, buoy_radius, boat_wide):
     for i, (x, y) in enumerate(path):
-        if blue_buoy.x == x and blue_buoy.y == y:
+
+        if blue_buoy.x - buoy_radius - boat_wide <= x <= blue_buoy.x + buoy_radius + boat_wide \
+                and blue_buoy.y - buoy_radius - boat_wide <= y <= blue_buoy.y + buoy_radius + boat_wide:
             path[i] = (x + avoidance_length, y + avoidance_length)
             print(f"Adjusted path at index {i} to avoid intersection.")
             return path
         else:
             continue
 
+# check any intersection, modify path, send modified path to control.
 
-def path_obstruction(global_path):
-    buoys = filter_buoys(SFR.objects)
+
+def path_obstruction(global_path, avoidance_length):
+    buoy_radius = 18.4
+    boat_wide = 45.72
+    buoys = filter_blue(SFR.objects)
     new_path = process(global_path)
     while (SFR.pp_done == False):
         while (buoys[0] != "blue_buoy"):
-            buoys = filter_buoys(SFR.objects)
-            edited_path = avoid_intersection(buoys[0], new_path, 1)
-            smooth_edited_path = process(edited_path)
-            send_to_controls("path", smooth_edited_path)
-            time.sleep(0.1)
-            while not SFR.pp_done:
-                pass
-            send_to_controls("stops")
+            buoys = filter_blue(SFR.objects)
+        for i, (x, y) in enumerate(new_path):
 
-            # check any intersection
-            #
-            # modify the path
-            # send the modified path to control
-
-            # while task not done : (while the boat position is not at waypoint 6 )
-            # while blue buoy not seen
-            # while (buoys[0] != 'blue_buoy'):
-            # follow path
-            # buoys = filter_buoys(SFR.objects)
-            # filter buoy to see blue
-            # edit path
-            # send path to control.
+            if buoys[0].x - buoy_radius - boat_wide <= x <= buoys[0].x + buoy_radius + boat_wide \
+               and buoys[0].y - buoy_radius - boat_wide <= y <= buoys[0].y + buoy_radius + boat_wide:
+                new_path[i] = (x + avoidance_length, y + avoidance_length)
+                print(f"Adjusted path at index {i} to avoid intersection.")
+            else:
+                continue
+        # edited_path = avoid_intersection(buoys[0], new_path, avoidance_length, )
+        edited_path = new_path
+        smooth_edited_path = process(edited_path)
+        send_to_controls("path", smooth_edited_path)
+        time.sleep(0.1)
+        while not SFR.pp_done:
+            pass
+        send_to_controls("stops")
