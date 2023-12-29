@@ -3,10 +3,7 @@ import src.SFR as SFR
 from src.tools.a_star import get_waypoints
 import numpy as np
 from src.modes.tasks_enum import Task
-#from src.path_execution import pure_pursuit
-from tools.a_star import get_waypoints
-#from src.path_execution import thruster_utils
-from tools.path_processing import send_to_controls, process
+from src.tools.path_processing import send_to_controls, process
 import rospy
 from src.buoys import Buoy
 import time

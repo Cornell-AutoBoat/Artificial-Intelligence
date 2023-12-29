@@ -6,10 +6,8 @@ from src.modes.tasks_enum import Task
 import numpy as np
 from src.tools.utils import filter_objects, get_midpoint, map_to_global
 import src.SFR as SFR
-from tools.a_star import get_waypoints
+from src.tools.a_star import get_waypoints
 from src.tools.path_processing import send_to_controls, process
-from src.path_execution import pure_pursuit
-from src.path_execution import thruster_utils
 import time
 
 
